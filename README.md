@@ -10,11 +10,12 @@ Self hosting is generally not recommended, but this might change in the future. 
 # Requirements
 |Package   |Version   |
 |---|---|
-|discord.py     |~=1.6.0 |
-|motor          |~=2.3.0 | 
+|discord.py     |~=1.7.2 |
+|motor          |~=2.4.0 | 
 |python-dotenv  |~=0.15.0| 
 |pytimeparse    |~=1.1.8 | 
-|aiohttp        |~=3.6.3 | 
-|Pillow         |~=8.1.0 | 
-|pytz           |~=2020.4|
+|aiohttp        |~=3.7.4 | 
+|Pillow         |~=8.2.0 | 
+|pytz           |~=2021.1|
 |python-dateutil|~=2.8.1 |
+|mystbin.py     |~=2.1.3 |
