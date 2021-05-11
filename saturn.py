@@ -33,7 +33,7 @@ class Saturn(commands.Bot):
             description="A multipurpose discord bot made in python.",
             intents=intents,
             case_insensitive=True,
-            owner_ids=[int(owner_id) for owner_id in os.environ.get("OWNER_IDS").split(" ")],
+            owner_ids=[int(owner_id) for owner_id in os.environ.get("OWNERIDS").split(" ")],
             allowed_mentions=mentions   
         )
         self.ready = False
