@@ -14,10 +14,13 @@ async def automod_log(bot, message, action, reason) -> None:
     data = await bot.config.find_one({"_id": message.guild.id})
     try:
         automod = message.guild.get_channel(data['automod_logs'])
+        status = data['automod_logs_toggle']
 
     except (TypeError, KeyError):
         return
-    if not automod: return
+
+    if not automod or not status:
+        return
 
     em = SaturnEmbed(
         title='Automod',
@@ -163,13 +166,13 @@ def get_cache(bot, member) -> list or None:
 
             return bot.message_cache[member.id]
 
-    except (TypeError, KeyError):
+    except (TypeError, KeyError): 
         return []
 
 def is_spamming(bot, member):
-    cache = bot.get_cache(member)
+    cache = get_cache(bot, member)
 
-    if len(cache) > 5:
+    if len(cache) > 5: # more than 5 messages in the cache
         return True
 
     return False
@@ -329,7 +332,7 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
 
     @anti_profanity.command(
         name='toggle',
-        aliases=['switch', 'tggle'],
+        aliases=['switch', 'onoff', 'tggle'],
         description='Toggles the anti-profanity system on or off.'
     )
     @commands.cooldown(1, 3, commands.BucketType.guild)
@@ -457,7 +460,7 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
 
     @anti_spam.command(
         name='toggle',
-        aliases=['switch', 'tggle'],
+        aliases=['switch', 'onoff', 'tggle'],
         description='Toggles the anti-spam system on or off.'
     )
     @commands.cooldown(1, 3, commands.BucketType.guild)

@@ -406,10 +406,11 @@ class Config(commands.Cog):
             colour=GREEN)
         await ctx.send(embed=em)
 
-    @commands.command(
+    @commands.group(
         name='messagelogs',
         aliases=['msglogs'],
         description='The command to change the settings for the message log channel.',
+        invoke_without_command=True,
     )
     async def message_logs(self, ctx, channel: discord.TextChannel):
         await self.bot.config.update_one(
@@ -420,10 +421,35 @@ class Config(commands.Cog):
             colour=GREEN)
         await ctx.send(embed=em)
 
-    @commands.command(
+    @message_logs.command(
+        name='toggle',
+        aliases=['switch', 'onoff', 'tggle'],
+        description='Toggle message logs on and off.'
+    )
+    async def toggle_message_logs(self, ctx):
+        data = await self.bot.config.find_one({"_id": ctx.guild.id})
+        try:
+            if not data['message_logs_toggle']:
+                toggle = False
+            else:
+                toggle = data['message_logs_toggle']
+
+        except (TypeError, KeyError):
+            toggle = False
+
+        await self.bot.config.update_one({"_id": ctx.guild.id},
+                                         {'$set': {"message_logs_toggle": not toggle}}, upsert=True)
+        status = "enabled" if not toggle else "disabled"
+        em = SaturnEmbed(
+            description=f"{CHECK} {status.title()} message logging.",
+            color=GREEN)
+        await ctx.send(embed=em)    
+
+    @commands.group(
         name='modlogs',
         aliases=['moderationlogs'],
         description='The command to change the settings for the moderation log channel.',
+        invoke_without_command=True,
     )
     async def mod_logs(self, ctx, channel: discord.TextChannel):
         await self.bot.config.update_one(
@@ -432,6 +458,30 @@ class Config(commands.Cog):
         em = SaturnEmbed(
             description=f"{CHECK} The `moderation logs` channel was set to {channel.mention}.",
             colour=GREEN)
+        await ctx.send(embed=em)
+
+    @mod_logs.command(
+        name='toggle',
+        aliases=['switch', 'onoff', 'tggle'],
+        description='Toggle moderation logs on and off.'
+    )
+    async def toggle_mod_logs(self, ctx):
+        data = await self.bot.config.find_one({"_id": ctx.guild.id})
+        try:
+            if not data['mod_logs_toggle']:
+                toggle = False
+            else:
+                toggle = data['mod_logs_toggle']
+
+        except (TypeError, KeyError):
+            toggle = False
+
+        await self.bot.config.update_one({"_id": ctx.guild.id},
+                                         {'$set': {"mod_logs_toggle": not toggle}}, upsert=True)
+        status = "enabled" if not toggle else "disabled"
+        em = SaturnEmbed(
+            description=f"{CHECK} {status.title()} moderation logging.",
+            color=GREEN)
         await ctx.send(embed=em)
 
     @commands.group(
@@ -449,9 +499,33 @@ class Config(commands.Cog):
             colour=GREEN)
         await ctx.send(embed=em)
 
+    # @member_logs.command(
+    #     name='toggle',
+    #     aliases=['switch', 'onoff', 'tggle'],
+    #     description='Toggle member logs on and off.'
+    # )
+    # async def toggle_member_logs(self, ctx):
+    #     data = await self.bot.config.find_one({"_id": ctx.guild.id})
+    #     try:
+    #         if not data['member_logs_toggle']:
+    #             toggle = False
+    #         else:
+    #             toggle = data['member_logs_toggle']
+
+    #     except (TypeError, KeyError):
+    #         toggle = False
+
+    #     await self.bot.config.update_one({"_id": ctx.guild.id},
+    #                                      {'$set': {"member_logs_toggle": not toggle}}, upsert=True)
+    #     status = "enabled" if not toggle else "disabled"
+    #     em = SaturnEmbed(
+    #         description=f"{CHECK} {status.title()} member logging.",
+    #         color=GREEN)
+    #     await ctx.send(embed=em)
+
     @member_logs.command(
         name='level',
-        aliases=['levels', 'log', 'changelevel', 'setlevel'],
+        aliases=['levels', 'log', 'changelevel', 'setlevel', 'switch', 'onoff', 'tggle'],
         description='Change the default levels of what member actions to log.'
     )
     async def change_log_level(self, ctx, level: typing.Optional[str]):
@@ -506,18 +580,43 @@ class Config(commands.Cog):
             colour=BLUE)
         await ctx.send(embed=em)
 
-    @commands.command(
+    @commands.group(
         name='automod',
         aliases=['auto-moderation', 'amod', 'automoderation'],
         description='The command to change the settings for the automod log channel.',
+        invoke_without_command=True,
     )
-    async def auto_mod_logs(self, ctx, channel: discord.TextChannel):
+    async def automod_logs(self, ctx, channel: discord.TextChannel):
         await self.bot.config.update_one(
             {"_id": ctx.guild.id}, {'$set': {"automod_logs": channel.id}}, upsert=True)
 
         em = SaturnEmbed(
             description=f"{CHECK} The `automod logs` channel was set to {channel.mention}.",
             colour=GREEN)
+        await ctx.send(embed=em)
+
+    @automod_logs.command(
+        name='toggle',
+        aliases=['switch', 'onoff', 'tggle'],
+        description='Toggle auto-moderation logs on and off.'
+    )
+    async def toggle_automod_logs(self, ctx):
+        data = await self.bot.config.find_one({"_id": ctx.guild.id})
+        try:
+            if not data['automod_logs_toggle']:
+                toggle = False
+            else:
+                toggle = data['automod_logs_toggle']
+
+        except (TypeError, KeyError):
+            toggle = False
+
+        await self.bot.config.update_one({"_id": ctx.guild.id},
+                                         {'$set': {"automod_logs_toggle": not toggle}}, upsert=True)
+        status = "enabled" if not toggle else "disabled"
+        em = SaturnEmbed(
+            description=f"{CHECK} {status.title()} auto-moderation logging.",
+            color=GREEN)
         await ctx.send(embed=em)
 
     @commands.group(

@@ -101,8 +101,12 @@ class Events(commands.Cog):
             data = await self.bot.config.find_one({"_id": message.guild.id})
             try:
                 message_logs = message.guild.get_channel(data['message_logs'])
+                status = data['message_logs_toggle']
 
             except (TypeError, KeyError):
+                return
+
+            if not message_logs or not status:
                 return
 
             em = SaturnEmbed(
@@ -145,8 +149,12 @@ class Events(commands.Cog):
             data = await self.bot.config.find_one({"_id": after.guild.id})
             try:
                 message_logs = after.guild.get_channel(data['message_logs'])
+                status = data['message_logs_toggle']
 
             except (TypeError, KeyError):
+                return
+
+            if not message_logs or not status:
                 return
 
             em = SaturnEmbed(

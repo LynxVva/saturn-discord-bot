@@ -136,12 +136,14 @@ async def create_log(bot, member: discord.Member, guild, action, moderator, reas
         pass
 
     # send it to the log channel because why not lol
-    data, mod_logs = await bot.config.find_one({"_id": guild.id}), None
+    data = await bot.config.find_one({"_id": guild.id})
     try:
         mod_logs = guild.get_channel(data['mod_logs'])
+        status = data['message_logs_toggle']
 
     except (TypeError, KeyError):
-        pass
+        mod_logs = None
+        status = False
 
     action_ = action
     if action.find("ban") != -1:
@@ -170,12 +172,13 @@ async def create_log(bot, member: discord.Member, guild, action, moderator, reas
         em.add_field(name='Reason', value=reason)
 
     try:
-        await mod_logs.send(embed=em)
+        if status:
+            await mod_logs.send(embed=em)
 
-    except AttributeError:
-        pass
+        else:
+            pass
 
-    except discord.HTTPException:
+    except (AttributeError, discord.HTTPException):
         pass
 
     _action = action + ((' for ' + duration) if duration else '')
