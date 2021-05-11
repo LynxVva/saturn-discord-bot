@@ -498,7 +498,11 @@ class Mod(commands.Cog, name='Moderation'):
             member = guild.get_member(value['_id']) or await self.bot.fetch_user(value['_id'])
 
             data = await self.bot.config.find_one({"_id": guild.id})
-            mute_role = guild.get_role(data['mute_role'])
+            try:
+                mute_role = guild.get_role(data['mute_role'])
+
+            except (TypeError, KeyError):
+                continue
 
             try:
                 join_delta = utc() - member.joined_at. \

@@ -14,13 +14,10 @@ async def automod_log(bot, message, action, reason) -> None:
     data = await bot.config.find_one({"_id": message.guild.id})
     try:
         automod = message.guild.get_channel(data['automod_logs'])
-        status = data['automod_logs_toggle']
 
     except (TypeError, KeyError):
         return
-
-    if not automod or not status:
-        return
+    if not automod: return
 
     em = SaturnEmbed(
         title='Automod',
@@ -87,8 +84,8 @@ async def profanity_check(bot, message):
 async def spam_check(bot, message):
     _data = await bot.config.find_one({"_id": message.guild.id})
     try:
-        if _data['spam_toggle'] and is_spamming(bot, message.author):  # check that spam is on and author is spamming
-            _cache = get_cache(bot, message.author)  # make a copy of the cache
+        if _data['spam_toggle'] and await is_spamming(bot, message.author):  # check that spam is on and author is spamming
+            _cache = await get_cache(bot, message.author)  # make a copy of the cache
             # so it doesn't double the message
             await delete_cache(bot, message.author)
 
@@ -96,7 +93,7 @@ async def spam_check(bot, message):
                 to_delete = len(_cache)
                 try:
                     # purge the spam messages sent by the author
-                    # I originally had the check to be lambda m: m in get_cache but it just didn't quite work
+                    # I originally had the check to be lambda m: m in await get_cache() but it just didn't quite work
                     # because I was emptying the cache after the messages were purged
                     await message.channel.purge(
                         limit=to_delete,
@@ -154,25 +151,25 @@ async def update_cache(bot, message: discord.Message):
 
     bot.message_cache[message.author.id].append(message)
 
-def get_cache(bot, member) -> list or None:
+async def get_cache(bot, member) -> list or None:
     """
     Retrieve a member's message cache.
     """
     try:
         for message in bot.message_cache[member.id]:
             # filter out all items in the bot._cache that were created more than 5 seconds ago
-            if utc() - datetime.timedelta(seconds=5) > message.created_at:
+            if (utc() - datetime.timedelta(seconds=5)) > message.created_at.replace(tzinfo=datetime.timezone.utc):
                 bot.message_cache[member.id].remove(message)
 
             return bot.message_cache[member.id]
 
-    except (TypeError, KeyError): 
+    except (TypeError, KeyError):
         return []
 
-def is_spamming(bot, member):
-    cache = get_cache(bot, member)
+async def is_spamming(bot, member):
+    cache = await get_cache(bot, member)
 
-    if len(cache) > 5: # more than 5 messages in the cache
+    if len(cache) > 5:
         return True
 
     return False
@@ -332,7 +329,7 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
 
     @anti_profanity.command(
         name='toggle',
-        aliases=['switch', 'onoff', 'tggle'],
+        aliases=['switch', 'tggle'],
         description='Toggles the anti-profanity system on or off.'
     )
     @commands.cooldown(1, 3, commands.BucketType.guild)
@@ -460,7 +457,7 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
 
     @anti_spam.command(
         name='toggle',
-        aliases=['switch', 'onoff', 'tggle'],
+        aliases=['switch', 'tggle'],
         description='Toggles the anti-spam system on or off.'
     )
     @commands.cooldown(1, 3, commands.BucketType.guild)

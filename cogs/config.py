@@ -499,86 +499,86 @@ class Config(commands.Cog):
             colour=GREEN)
         await ctx.send(embed=em)
 
-    # @member_logs.command(
-    #     name='toggle',
-    #     aliases=['switch', 'onoff', 'tggle'],
-    #     description='Toggle member logs on and off.'
-    # )
-    # async def toggle_member_logs(self, ctx):
-    #     data = await self.bot.config.find_one({"_id": ctx.guild.id})
-    #     try:
-    #         if not data['member_logs_toggle']:
-    #             toggle = False
-    #         else:
-    #             toggle = data['member_logs_toggle']
-
-    #     except (TypeError, KeyError):
-    #         toggle = False
-
-    #     await self.bot.config.update_one({"_id": ctx.guild.id},
-    #                                      {'$set': {"member_logs_toggle": not toggle}}, upsert=True)
-    #     status = "enabled" if not toggle else "disabled"
-    #     em = SaturnEmbed(
-    #         description=f"{CHECK} {status.title()} member logging.",
-    #         color=GREEN)
-    #     await ctx.send(embed=em)
-
     @member_logs.command(
-        name='level',
-        aliases=['levels', 'log', 'changelevel', 'setlevel', 'switch', 'onoff', 'tggle'],
-        description='Change the default levels of what member actions to log.'
+        name='toggle',
+        aliases=['switch', 'onoff', 'tggle'],
+        description='Toggle member logs on and off.'
     )
-    async def change_log_level(self, ctx, level: typing.Optional[str]):
-        if not level:
-            # TODO: add option to customizably enable and disable logging features
-            em = SaturnEmbed(
-                description=f"""
-                Each level has all the logging of the levels below it.
-                
-                `LOW - member join and leaves`
-                `MEDIUM - role changes`
-                `HIGH - nickname changes`
-                `OFF - turn member logging off`
-                """,
-                colour=BLUE)
-            em.set_author(name="Member Log Levels",
-                          icon_url=INFO_URL)
-            return await ctx.send(embed=em)
-
-        if level.lower() not in ('low', 'medium', 'high', 'off'):
-            em = SaturnEmbed(
-                description=f"{ERROR} Invalid level given."
-                            f"```Choose between LOW, MEDIUM, HIGH and OFF```",
-                colour=RED
-            )
-            await ctx.send(embed=em)
-
-        else:
-            await self.bot.config.update_one(
-                {"_id": ctx.guild.id}, {'$set': {"member_log_level": level.upper()}}, upsert=True)
-            em = SaturnEmbed(
-                description=f"{CHECK} The `member logs` level was set to `{level.upper()}`",
-                colour=GREEN)
-            await ctx.send(embed=em)
-
-    @member_logs.command(
-        name='current',
-        aliases=['show'],
-        description="Show the current member log level."
-    )
-    async def show_member_log_level(self, ctx):
+    async def toggle_member_logs(self, ctx):
         data = await self.bot.config.find_one({"_id": ctx.guild.id})
         try:
-            member_log_level = data['member_log_level']
+            if not data['member_logs_toggle']:
+                toggle = False
+            else:
+                toggle = data['member_logs_toggle']
 
-        except (TypeError, KeyError): 
-            member_log_level = "HIGH"
+        except (TypeError, KeyError):
+            toggle = False
 
+        await self.bot.config.update_one({"_id": ctx.guild.id},
+                                         {'$set': {"member_logs_toggle": not toggle}}, upsert=True)
+        status = "enabled" if not toggle else "disabled"
         em = SaturnEmbed(
-            description=f"{INFO} The member logs level is currently set to `{member_log_level.upper()}`\n"
-                        f"```Set the member log level via the memberlogs level command```",
-            colour=BLUE)
+            description=f"{CHECK} {status.title()} member logging.",
+            color=GREEN)
         await ctx.send(embed=em)
+
+    # @member_logs.command(
+    #     name='level',
+    #     aliases=['levels', 'log', 'changelevel', 'setlevel', 'switch', 'onoff', 'tggle'],
+    #     description='Change the default levels of what member actions to log.'
+    # )
+    # async def change_log_level(self, ctx, level: typing.Optional[str]):
+    #     if not level:
+    #         # TODO: add option to customizably enable and disable logging features
+    #         em = SaturnEmbed(
+    #             description=f"""
+    #             Each level has all the logging of the levels below it.
+                
+    #             `LOW - member join and leaves`
+    #             `MEDIUM - role changes`
+    #             `HIGH - nickname changes`
+    #             `OFF - turn member logging off`
+    #             """,
+    #             colour=BLUE)
+    #         em.set_author(name="Member Log Levels",
+    #                       icon_url=INFO_URL)
+    #         return await ctx.send(embed=em)
+
+    #     if level.lower() not in ('low', 'medium', 'high', 'off'):
+    #         em = SaturnEmbed(
+    #             description=f"{ERROR} Invalid level given."
+    #                         f"```Choose between LOW, MEDIUM, HIGH and OFF```",
+    #             colour=RED
+    #         )
+    #         await ctx.send(embed=em)
+
+    #     else:
+    #         await self.bot.config.update_one(
+    #             {"_id": ctx.guild.id}, {'$set': {"member_log_level": level.upper()}}, upsert=True)
+    #         em = SaturnEmbed(
+    #             description=f"{CHECK} The `member logs` level was set to `{level.upper()}`",
+    #             colour=GREEN)
+    #         await ctx.send(embed=em)
+
+    # @member_logs.command(
+    #     name='current',
+    #     aliases=['show'],
+    #     description="Show the current member log level."
+    # )
+    # async def show_member_log_level(self, ctx):
+    #     data = await self.bot.config.find_one({"_id": ctx.guild.id})
+    #     try:
+    #         member_log_level = data['member_log_level']
+
+    #     except (TypeError, KeyError): 
+    #         member_log_level = "HIGH"
+
+    #     em = SaturnEmbed(
+    #         description=f"{INFO} The member logs level is currently set to `{member_log_level.upper()}`\n"
+    #                     f"```Set the member log level via the memberlogs level command```",
+    #         colour=BLUE)
+    #     await ctx.send(embed=em)
 
     @commands.group(
         name='automod',
