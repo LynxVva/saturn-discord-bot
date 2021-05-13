@@ -2,7 +2,8 @@ import discord
 
 # Colours, emotes, and useful stuff
 
-MAIN = 0xF6009B
+# MAIN = 0xF6009B
+MAIN = discord.Colour.default()
 RED = discord.Colour.red()
 GREEN = discord.Colour.green()
 DIFF_GREEN = 0x677c1e
