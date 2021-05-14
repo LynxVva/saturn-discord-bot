@@ -49,6 +49,10 @@ async def syntax(cmd) -> str:
     params = " ".join(params)
     return f"{str(cmd.qualified_name)} {params}"
 
+async def param_syntax(cmd):
+    _syntax = await syntax(cmd)
+    return _syntax.replace(str(cmd.qualified_name), '')[1:]
+
 # noinspection PyShadowingNames
 async def error_arg_syntax(cmd, arg):
     cmd_syntax = await syntax(cmd)

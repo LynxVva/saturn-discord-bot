@@ -21,7 +21,7 @@ class ErrorHandler(commands.Cog):
 
         send_embed = SaturnEmbed(
             description=f"{ERROR} Something went wrong. Whoops! "
-                        f"Please report this error in our [Support Server](https://discord.gg/A4DFFUD3zX)",
+                        f"Please report this error in our [Support Server]({SUPPORT_SERVER})",
             colour=RED
         )
         stdout_embed = SaturnEmbed(

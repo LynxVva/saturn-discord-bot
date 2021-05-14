@@ -1,3 +1,4 @@
+from assets.cmd import syntax
 from assets.strings import flatten
 from assets import *
 
@@ -111,25 +112,35 @@ class Help(commands.Cog):
         # command signature, description, cooldown, checks and stuff on command paginator
 
         if not entity:
+            await ctx.send(
+                # content=SUPPORT_SERVER,
+                embed=discord.Embed(
+                    title="Quick Links",
+                    description=f"[Invite (Recommended)]({NORMAL_INVITE})\n"
+                                f"[Invite (Administrator)]({ADMIN_INVITE})\n"
+                                f"[Discord Bot List]({DISCORDBOTLIST_URL})\n"
+                                f"[Support Server]({SUPPORT_SERVER})",
+                    colour=MAIN
+                )
+            )
             title = ["Saturn's Commmands"]
             title.extend(cogs)
 
             entries.append(
-                f"Saturn is a multipurpose discord bot.\n"
-                f"[Invite (Recommended)]({NORMAL_INVITE})\n"
-                f"[Invite (Administrator)]({ADMIN_INVITE})\n\n" +
-                '\n'.join([f"`Page {index} - {c}`" for index, c in enumerate(cogs, start=2)]) +
-                f"\n\nPress the numbers emote to skip to a page.")
+                f"Saturn is a multipurpose discord bot.\n```yaml\n" + 
+                '\n'.join([f"Page {index} : {c}" for index, c in enumerate(cogs, start=2)]) +
+                f"```\nPress the numbers emote to skip to a page."
+                f"\nPress the info emote to learn how to navigate the help menu.")
             for cog in cogs:
                 _cog = self.bot.get_cog(cog)
-                pages = ""
+                pages = "```\n"
 
                 for command in _cog.walk_commands():
                     invoke = await self.full_command_syntax(ctx, command)
                     if invoke:
-                        pages += f"`{invoke}`\n"
+                        pages += f"{invoke}\n"
 
-                entries.append(pages)
+                entries.append(pages + "```")
 
             if not entries:
                 entries = "There are no commands in this module that you have access too. Womp womp..."
