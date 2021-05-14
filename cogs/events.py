@@ -1,6 +1,6 @@
 from assets.strings import diff_lists
 from assets import *
-from cogs.automod import profanity_check
+from cogs.automod import check_for_profanity, profanity_check
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ class Events(commands.Cog):
         Fires when a message is deleted
         """
         if not message.author.bot:
-            if await profanity_check(self.bot, message):
+            if await check_for_profanity(self.bot, str(message.content).lower()):
                 return
 
             schema = {
@@ -126,7 +126,9 @@ class Events(commands.Cog):
         Fires when a message is edited
         """
         if not after.author.bot:
-            await profanity_check(self.bot, after)
+            if await profanity_check(self.bot, after):
+                return
+
             if before.content == after.content:
                 return
 

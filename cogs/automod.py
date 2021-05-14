@@ -30,6 +30,23 @@ async def automod_log(bot, message, action, reason) -> None:
     em.set_author(icon_url=message.author.avatar_url, name=message.author)
     await automod.send(embed=em)
 
+async def check_for_profanity(bot, msg):
+    if (
+        # message just has plain profanity
+        profanity.contains_profanity(msg) or
+        profanity.contains_profanity(
+            msg.replace(' ', '')) or  # message has spaces and remove the spaces
+        profanity.contains_profanity(
+            re.sub(r'[^\w\s]', '', msg)) or  # message has punctuation, remove punctuation
+        # message has invisible unicode character
+        profanity.contains_profanity(msg.replace('­', '')) or
+        profanity.contains_profanity(
+            "".join(collections.OrderedDict.fromkeys(msg)))  # duplicate chars
+    ):
+        return True
+
+    return False
+
 async def profanity_check(bot, message):
     _data = await bot.config.find_one({"_id": message.guild.id})
     msg = str(message.content).lower()
@@ -45,18 +62,7 @@ async def profanity_check(bot, message):
                     bot.path + '/assets/profanity.txt')
 
             # anti-profanity
-            if (
-                    # message just has plain profanity
-                    profanity.contains_profanity(msg) or
-                    profanity.contains_profanity(
-                        msg.replace(' ', '')) or  # message has spaces and remove the spaces
-                    profanity.contains_profanity(
-                        re.sub(r'[^\w\s]', '', msg)) or  # message has punctuation, remove punctuation
-                    # message has invisible unicode character
-                    profanity.contains_profanity(msg.replace('­', '')) or
-                    profanity.contains_profanity(
-                        "".join(collections.OrderedDict.fromkeys(msg)))  # duplicate chars
-            ):
+            if await check_for_profanity(bot, msg):
                 if await profanity_command_check(bot, message):
                     return False  # make sure that they're not adding a word
                 # in that case then don't do stuff
