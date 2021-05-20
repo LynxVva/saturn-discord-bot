@@ -1,3 +1,5 @@
+from discord.errors import Forbidden
+from assets.cmd import get_prefix
 import os
 from pathlib import Path
 
@@ -89,19 +91,24 @@ class Saturn(commands.Bot):
         ctx = await self.get_context(message)
 
         if ctx.command and ctx.guild:
-            if not ctx.guild.me.guild_permissions.send_messages:
+            perms = dict(ctx.channel.permissions_for(ctx.guild.me))
+            if not perms['send_messages']:
                 em = SaturnEmbed(
                     description=f"{WARNING} Oops! I can't send messages! Please update my permissions and try again.",
                     colour=GOLD)
                 return await ctx.author.send(embed=em)
 
-            elif not ctx.guild.me.guild_permissions.embed_links:
+            elif not perms['embed_links']:
                 return await ctx.send("Hey! Please enable the `Embed Links` permission for me!")
 
-            elif not ctx.guild.me.guild_permissions.external_emojis:
+            elif (
+                    (not perms['external_emojis']) or 
+                    (not perms['attach_files']) or
+                    (not perms['add_reactions'])
+                 ):
                 em = SaturnEmbed(
                     description=f"{WARNING} Oops! Please make sure that I have the following permissions:"
-                                f"```Send Messages, Embed Links, Use External Emojis```",
+                                f"```Send Messages, Embed Links, Use External Emojis, Attach Files, Add Reactions```",
                     colour=GOLD)
                 return await ctx.send(embed=em)
 
