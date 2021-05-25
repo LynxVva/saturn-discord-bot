@@ -67,6 +67,8 @@ async def error_arg_syntax(cmd, arg):
     return f"{cmd_syntax}\n{before_pointers}{pointers}"  # return the syntax with the ^^^^^ under
     # to indicate which argument is parsed wrongly
 
+async def get_permissions(ctx, member):
+    return dict(ctx.channel.permissions_for(member))
 
 # noinspection PyBroadException
 async def retrieve_raw_prefix(bot, message) -> list:

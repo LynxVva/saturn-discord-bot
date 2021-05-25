@@ -1,3 +1,4 @@
+from assets.cmd import get_permissions
 import re
 import os
 from copy import deepcopy
@@ -300,28 +301,48 @@ class Utility(commands.Cog):
     async def user_info(self, ctx, member: typing.Optional[typing.Union[discord.Member, discord.User]]):
         member = member or ctx.author
 
-        embed = SaturnEmbed(colour=member.colour if isinstance(member, discord.Member) else MAIN,
-                            timestamp=utc())
+        embed = SaturnEmbed(
+            description=member.mention,
+            colour=member.colour if isinstance(member, discord.Member) else MAIN,
+            timestamp=utc())
 
         embed.set_thumbnail(url=member.avatar_url)
-        embed.set_author(icon_url=member.avatar_url, name=member.name)
-
-        join_delta = (utc() - member.joined_at.replace(tzinfo=datetime.timezone.utc)).total_seconds()
+        embed.set_author(icon_url=member.avatar_url, name=member)
+            
         created_delta = (utc() - member.created_at.replace(
             tzinfo=datetime.timezone.utc)).total_seconds()
 
         embed.add_field(name="ID", value=member.id)
-        embed.add_field(name="Joined Discord", value=general_convert_time(created_delta) + ' ago')
+        embed.add_field(name="Joined Discord", value=general_convert_time(created_delta) + ' ago', inline=True)
         if isinstance(member, discord.Member):
-            roles = " ".join(reversed([f"<@&{r.id}>" for r in member.roles[1:]]))
+            join_delta = (utc() - member.joined_at.replace(tzinfo=datetime.timezone.utc)).total_seconds()
+            member_roles = member.roles[1:]
+            roles = " ".join(reversed([f"<@&{r.id}>" for r in member_roles]))
 
-            embed.add_field(name=f"Joined {ctx.guild}", value=general_convert_time(join_delta) + ' ago')
+            embed.add_field(name=f"Joined {ctx.guild}", value=general_convert_time(join_delta) + ' ago', inline=True)
             if roles:
                 embed.add_field(
-                    name="Roles",
-                    value=roles,
-
+                    name="Roles ({})".format(int(len(member_roles))),
+                    value=roles
                 )
+
+            member_perms = await get_permissions(ctx, member)
+            display_perms = []
+
+            for permission, value in member_perms.items():
+                if value:
+                    display_perms.append(
+                        ' '.join(
+                            [item.title() for item in str(permission).split('_')]
+                            )
+                        )
+
+                continue
+
+            embed.add_field(
+                name="Permissions ({})".format(int(len(display_perms))),
+                value=", ".join(display_perms)
+            )
 
         await ctx.send(embed=embed)
 

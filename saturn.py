@@ -1,5 +1,5 @@
 from discord.errors import Forbidden
-from assets.cmd import get_prefix
+from assets.cmd import get_permissions, get_prefix
 import os
 from pathlib import Path
 
@@ -91,7 +91,8 @@ class Saturn(commands.Bot):
         ctx = await self.get_context(message)
 
         if ctx.command and ctx.guild:
-            perms = dict(ctx.channel.permissions_for(ctx.guild.me))
+            perms = await get_permissions(ctx, ctx.guild.me)
+            
             if not perms['send_messages']:
                 em = SaturnEmbed(
                     description=f"{WARNING} Oops! I can't send messages! Please update my permissions and try again.",
