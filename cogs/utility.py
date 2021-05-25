@@ -17,7 +17,7 @@ async def create_export_file(bot, ctx, messages, channel):
 
     except FileNotFoundError:
         try:
-            os.mkdir(f"{bot.path}/assets/channel_exports")
+            os.mkdir(f"{bot.path}/assets/txt_files")
 
         except FileExistsError:
             pass
@@ -26,7 +26,7 @@ async def create_export_file(bot, ctx, messages, channel):
 
 
 async def _create_efile(bot, ctx, messages, channel):
-    with open(f'{bot.path}/assets/channel_exports/{channel.id}-export.txt', 'w', encoding='utf-8') as f:
+    with open(f'{bot.path}/assets/txt_files/{channel.id}-export.txt', 'w', encoding='utf-8') as f:
         f.write(f"{len(messages)} messages exported from the #{channel} channel by {ctx.author}:\n\n")
         for message in messages:
             content = message.clean_content
@@ -72,65 +72,70 @@ class Utility(commands.Cog):
     async def before_clear_snipe_cache(self):
         await self.bot.wait_until_ready()
 
-    # @commands.group(
-    #     name='poll',
-    #     aliases=['pl', 'question'],
-    #     description="Start a poll for others to vote on.",
-    #     invoke_without_command=True
-    # )
-    # @commands.cooldown(1, 3, commands.BucketType.member)
-    # async def poll(self, ctx, channel: typing.Optional[discord.TextChannel], question, *choices):
-    #     channel = channel or ctx.channel
+    @commands.group(
+        name='poll',
+        aliases=['pl', 'question'],
+        description="Start a poll for others to vote on.",
+        invoke_without_command=True
+    )
+    @commands.cooldown(1, 3, commands.BucketType.member)
+    async def poll(self, ctx, channel: typing.Optional[discord.TextChannel], question, *choices):
+        channel = channel or ctx.channel
 
-    #     if not choices:
-    #         em = SaturnEmbed(
-    #             description=f"{ERROR} Please include both a question and choices.",
-    #             color=RED)
-    #         return await ctx.send(embed=em)
+        if not choices:
+            em = SaturnEmbed(
+                description=f"{ERROR} Please include both a question and choices.",
+                color=RED)
+            return await ctx.send(embed=em)
 
-    #     if len(choices) > 10 or len(choices) < 2:
-    #         em = SaturnEmbed(
-    #             description=f"{ERROR} The amount of choices provided is not within acceptable boundaries.\n"
-    #                         f"```Number of choices must be in between 1 and 10```",
-    #             color=RED)
-    #         return await ctx.send(embed=em)
+        if len(choices) > 10 or len(choices) < 2:
+            em = SaturnEmbed(
+                description=f"{ERROR} The amount of choices provided is not within acceptable boundaries.\n"
+                            f"```Number of choices must be in between 1 and 10```",
+                color=RED)
+            return await ctx.send(embed=em)
 
-    #     em = SaturnEmbed(
-    #         title=question,
-    #         description='\n\n'.join(
-    #             ["{0} {1}".format(self.numbers[num], choice.replace('"', '')) for num, choice in enumerate(choices)]
-    #         ),
-    #         colour=MAIN,
-    #         timestamp=utc()
-    #     )
-    #     em.set_footer(text=f"Poll by {ctx.author.name}")
-    #     msg = await channel.send(embed=em)
+        em = SaturnEmbed(
+            title=question,
+            description='\n\n'.join(
+                ["{0} {1}".format(self.numbers[num], choice.replace('"', '')) for num, choice in enumerate(choices)]
+            ),
+            colour=MAIN,
+            timestamp=utc()
+        )
+        em.set_footer(text=f"Poll by {ctx.author.name}")
+        msg = await channel.send(embed=em)
 
-    #     valid_emotes = self.numbers[:(len(choices))]
-    #     for emoji in valid_emotes:
-    #         await msg.add_reaction(emoji)
+        self.polls[msg.id] = {
+            "question": question,
+            "choices": choices,
+            "channel": msg.channel.id,
+            "author": ctx.author.id,
+            "guild": ctx.guild.id,
+        }
 
-    #     self.polls[msg.id] = {
-    #         "question": question,
-    #         "choices": choices,
-    #         "channel": msg.channel.id,
-    #         "author": ctx.author.id,
-    #         "guild": ctx.guild.id,
-    #     }
+        valid_emotes = self.numbers[:(len(choices))]
+        for emoji in valid_emotes:
+            await msg.add_reaction(emoji)
 
-    # @poll.command(name='polls')
-    # async def _polls(self, ctx):
-    #     await ctx.send(self.polls)
+    @poll.command(name='polls')
+    async def _polls(self, ctx):
+        await ctx.send(self.polls)
 
-    # @poll.command(
-    #     name='show',
-    #     aliases=['results', 'res', 'result', 'sh'],
-    #     description="Show the results of a poll."
-    # )
-    # async def show_poll_results(self, ctx, poll_id):
-    #     if re.search(MESSAGE_LINK_REGEX, str(poll_id)): # discord message url like https://discord.com/channels/num/num/num
-    #         items = poll_id.split('/')[4:]
-    #     else:
+    @poll.command(
+        name='show',
+        aliases=['results', 'res', 'result', 'sh'],
+        description="Show the results of a poll."
+    )
+    async def show_poll_results(self, ctx, poll_id):
+        if re.search(MESSAGE_LINK_REGEX, str(poll_id)): # discord message url like https://discord.com/channels/num/num/num
+            items = poll_id.split('/')[4:]
+            guild_id, channel_id, message_id = ctx.guild.id, int(items[1]), int(items[2])
+
+            if await self.bot.get_guild(guild_id).get_channel(channel_id).fetch_message(message_id):
+                return await self.show_poll(ctx, message_id, channel_id)
+
+        else:
             # if await self.bot.get_channel(items[1]).fetch_message(items[2]):
             #     return await self.show_poll(items[2], items[1])
             # try:   
@@ -164,36 +169,53 @@ class Utility(commands.Cog):
             #         color=RED)
             #     return await ctx.send(embed=em)
 
-    #         em = SaturnEmbed(
-    #             description=f"{ERROR} No poll with an id of `{poll_id}` was found.",
-    #             color=RED)
-    #         await ctx.send(embed=em)
+            em = SaturnEmbed(
+                description=f"{ERROR} No poll with an id of `{poll_id}` was found.",
+                color=RED)
+            await ctx.send(embed=em)
 
-    # async def show_poll(self, message_id, channel_id):
-    #     message = await self.bot.get_channel(channel_id).fetch_message(message_id)
-    #     message_reactions = message.reactions
-    #     _poll = self.polls[message.id]
+    async def show_poll(self, ctx, message_id, channel_id):
+        message = await self.bot.get_guild(ctx.guild.id).get_channel(channel_id).fetch_message(message_id)
+        message_reactions = message.reactions 
+        _poll = self.polls[message.id]
 
-    #     print(message, message_reactions, _poll)
+        for reaction in message_reactions:
+            if reaction.custom_emoji:
+                message_reactions.remove(reaction)
 
-        # for reaction in message_reactions:
-        #     if reaction not in 
+            elif reaction.emoji not in self.numbers:
+                message_reactions.remove(reaction)
 
+            print(message_reactions)
 
+            # if (reaction.emoji not in self.numbers) or (reaction.custom_emoji == True):
+            #     print("uh oh dis not a emoji", reaction)
+            #     message_reactions.remove(reaction)
+
+            # else:
+            #     print("nvm we good lol", reaction)
+        
+        print(message_reactions)
+
+        
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if self.bot.ready:
-            if payload.message_id in self.polls:
-                message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
+            try:
+                if self.polls[payload.message_id]:
+                    message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
 
-                for reaction in message.reactions:
-                    if (not payload.member.bot and 
-                        payload.member in await reaction.users().flatten() and
-                        reaction.emoji != payload.emoji.name):
+                    for reaction in message.reactions:
+                        if (not payload.member.bot and 
+                            payload.member in await reaction.users().flatten() and
+                            reaction.emoji != payload.emoji.name):
 
-                        await message.remove_reaction(reaction.emoji, payload.member)
+                            await message.remove_reaction(reaction.emoji, payload.member)
 
-                    break
+                        break
+
+            except KeyError:
+                pass
 
     @commands.command(
         name='uptime',
@@ -364,7 +386,7 @@ class Utility(commands.Cog):
                 await asyncio.sleep(0.5)
                 await create_export_file(self.bot, ctx, messages, channel)
             
-            file = discord.File(f'{self.bot.path}/assets/channel_exports/{channel.id}-export.txt')
+            file = discord.File(f'{self.bot.path}/assets/txt_files/{channel.id}-export.txt')
 
         await msg.delete()
         em = SaturnEmbed(

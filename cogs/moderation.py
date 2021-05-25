@@ -48,7 +48,7 @@ async def purge_msgs(bot, ctx, limit, check):
         await asyncio.sleep(0.5)
         await create_purge_file(bot, ctx, deleted)
 
-    file = discord.File(f'{bot.path}/assets/purge_txts/purge-{deleted[0].id}.txt')
+    file = discord.File(f'{bot.path}/assets/txt_files/purge-{deleted[0].id}.txt')
 
     em = SaturnEmbed(
         title='Messages Purged',
@@ -70,7 +70,7 @@ async def create_purge_file(bot, ctx, deleted):
 
     except FileNotFoundError:
         try:
-            os.mkdir(f"{bot.path}/assets/purge_txts")
+            os.mkdir(f"{bot.path}/assets/txt_files")
 
         except FileExistsError:
             pass
@@ -78,7 +78,7 @@ async def create_purge_file(bot, ctx, deleted):
         await _create_pfile(bot, ctx, deleted)
 
 async def _create_pfile(bot, ctx, deleted):
-    with open(f'{bot.path}/assets/purge_txts/purge-{deleted[0].id}.txt', 'w+', encoding='utf-8') as f:
+    with open(f'{bot.path}/assets/txt_files/purge-{deleted[0].id}.txt', 'w+', encoding='utf-8') as f:
         f.write(f"{len(deleted)} messages deleted in the #{ctx.channel} channel by {ctx.author}:\n\n")
         for message in deleted:
             content = message.clean_content
@@ -482,7 +482,7 @@ class Mod(commands.Cog, name='Moderation'):
 
     @tasks.loop(seconds=30)
     async def purge_files(self):
-        for file in glob(self.bot.path + '/assets/purge_txts/*.txt'):
+        for file in glob(self.bot.path + '/assets/txt_files/*.txt'):
             os.unlink(file)
 
     @tasks.loop(seconds=1)
