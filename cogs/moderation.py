@@ -461,13 +461,13 @@ class Mod(commands.Cog, name='Moderation'):
 
     def __init__(self, bot):
         self.bot = bot
-        self.purge_task = self.purge_files.start()
+        self.txt_files = self.clean_txt_files.start()
         self.mod_task = self.update_modlogs.start()
         self.check_mods = self.check_mods.start()
 
     def cog_unload(self):
         self.mod_task.cancel()
-        self.purge_task.cancel()
+        self.txt_files.cancel()
 
     def cog_check(self, ctx):
         if ctx.guild:
@@ -481,7 +481,7 @@ class Mod(commands.Cog, name='Moderation'):
             await update_log_caseids(self.bot, guild)
 
     @tasks.loop(seconds=30)
-    async def purge_files(self):
+    async def clean_txt_files(self):
         for file in glob(self.bot.path + '/assets/txt_files/*.txt'):
             os.unlink(file)
 
@@ -576,8 +576,8 @@ class Mod(commands.Cog, name='Moderation'):
     async def before_check_mods(self):
         await self.bot.wait_until_ready()
 
-    @purge_files.before_loop
-    async def before_purge_files(self):
+    @clean_txt_files.before_loop
+    async def before_clean_txt_files(self):
         await self.bot.wait_until_ready()
 
     @update_modlogs.before_loop
