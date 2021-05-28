@@ -21,7 +21,7 @@ async def purge_msgs(bot, ctx, limit, check):
 
     if not len(deleted):
         em = SaturnEmbed(
-            description=f"{ERROR} Could not find any messages to delete.\n"
+            description=f"{CROSS} Could not find any messages to delete.\n"
                         f"```Messages older than 2 weeks cannot be deleted```",
             color=RED)
         return await ctx.send(embed=em)
@@ -722,13 +722,13 @@ class Mod(commands.Cog, name='Moderation'):
 
             else:
                 em = SaturnEmbed(
-                    description=f"{ERROR} Cases can't go into the negatives! It's just common sense.",
+                    description=f"{CROSS} Cases can't go into the negatives! It's just common sense.",
                     colour=RED)
                 await ctx.send(embed=em)
 
         else:
             em = SaturnEmbed(
-                description=f"{ERROR} An invalid case ID was given."
+                description=f"{CROSS} An invalid case ID was given."
                             f"```Please pick from {len(logs)} cases```",
                 colour=RED)
             await ctx.send(embed=em)
@@ -779,7 +779,7 @@ class Mod(commands.Cog, name='Moderation'):
 
         else:
             em = SaturnEmbed(
-                description=f"{ERROR} An invalid case ID was given."
+                description=f"{CROSS} An invalid case ID was given."
                             f"```Please pick from {len(logs)} cases```",
                 colour=RED)
             await ctx.send(embed=em)
@@ -858,7 +858,7 @@ class Mod(commands.Cog, name='Moderation'):
         delete_days = int(delete_days) if delete_days else 7
         if delete_days > 7:
             em = SaturnEmbed(
-                description=f"{ERROR} The `days_delete` parameter has to be either equal or less than 7.",
+                description=f"{CROSS} The `days_delete` parameter has to be either equal or less than 7.",
                 colour=RED)
             return await ctx.send(embed=em)
 
@@ -915,7 +915,7 @@ class Mod(commands.Cog, name='Moderation'):
         try:
             if self.bot.banned_users[member.id]:
                 em = SaturnEmbed(
-                    description=f"{ERROR} {member.mention} is already banned! "
+                    description=f"{CROSS} {member.mention} is already banned! "
                                 f"Talk about adding insult to injury.",
                     colour=RED)
                 return await ctx.send(embed=em)
@@ -942,7 +942,7 @@ class Mod(commands.Cog, name='Moderation'):
                        *, reason: typing.Optional[str] = "no reason provided"):
         if not members or len(members) > 5:
             em = SaturnEmbed(
-                description=f"{ERROR} Invalid members specified."
+                description=f"{CROSS} Invalid members specified."
                             f"```Limit must be between 1 and 5 members```",
                 colour=RED)
             return await ctx.send(embed=em)
@@ -961,7 +961,7 @@ class Mod(commands.Cog, name='Moderation'):
 
         if not len(failed) and not len(banned):
             em = SaturnEmbed(
-                description=f"{ERROR} Invalid members specified."
+                description=f"{CROSS} Invalid members specified."
                             f"```No members were given```",
                 colour=RED)
             return await ctx.send(embed=em)
@@ -975,7 +975,7 @@ class Mod(commands.Cog, name='Moderation'):
 
         else:
             em = SaturnEmbed(
-                description=f"{ERROR} `Could not ban all members.`",
+                description=f"{CROSS} `Could not ban all members.`",
                 colour=RED)
 
         if len(banned) > 0:
@@ -1065,7 +1065,7 @@ class Mod(commands.Cog, name='Moderation'):
                 try:
                     if mute_role in member.roles:
                         em = SaturnEmbed(
-                            description=f"{ERROR} {member.mention} is already muted! "
+                            description=f"{CROSS} {member.mention} is already muted! "
                                         f"Talk about adding insult to injury.",
                             colour=RED)
                         return await ctx.send(embed=em)
@@ -1083,7 +1083,7 @@ class Mod(commands.Cog, name='Moderation'):
 
             else:
                 em = SaturnEmbed(
-                    description=f"{ERROR} {member.mention} has the `Administrator` permission.",
+                    description=f"{CROSS} {member.mention} has the `Administrator` permission.",
                     color=RED)
                 await ctx.send(embed=em)
 
@@ -1101,13 +1101,13 @@ class Mod(commands.Cog, name='Moderation'):
             mute_role = ctx.guild.get_role(data['mute_role'])
             if not mute_role:
                 em = SaturnEmbed(
-                    description=f"{ERROR} This guild does not have a mute role set up.",
+                    description=f"{CROSS} This guild does not have a mute role set up.",
                     colour=RED)
                 return await ctx.send(embed=em)
 
         except (TypeError, KeyError):
             em = SaturnEmbed(
-                description=f"{ERROR} This guild does not have a mute role set up.",
+                description=f"{CROSS} This guild does not have a mute role set up.",
                 colour=RED)
             return await ctx.send(embed=em)
 
@@ -1129,7 +1129,7 @@ class Mod(commands.Cog, name='Moderation'):
                     pass
 
                 em = SaturnEmbed(
-                    description=f"{ERROR} {member.mention} is not muted.",
+                    description=f"{CROSS} {member.mention} is not muted.",
                     colour=RED)
                 return await ctx.send(embed=em)
 
@@ -1184,13 +1184,13 @@ class Mod(commands.Cog, name='Moderation'):
         channel = channel or ctx.channel
         if not time and time != 0:
             em = SaturnEmbed(
-                description=f"{ERROR} Please provide a valid time.",
+                description=f"{CROSS} Please provide a valid time.",
                 colour=RED)
             return await ctx.send(embed=em)
 
         if time > 21600 or time < 0:
             em = SaturnEmbed(
-                description=f"{ERROR} Slowmode time should be equal or less than 6 hours.",
+                description=f"{CROSS} Slowmode time should be equal or less than 6 hours.",
                 colour=RED)
             return await ctx.send(embed=em)
 
@@ -1386,7 +1386,7 @@ class Mod(commands.Cog, name='Moderation'):
 
         except AttributeError:
             em = SaturnEmbed(
-                description=f"{ERROR} {member.mention} is not in a voice channel.",
+                description=f"{CROSS} {member.mention} is not in a voice channel.",
                 color=RED)
             return await ctx.send(embed=em)
 

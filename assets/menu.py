@@ -261,19 +261,9 @@ class Paginator(Session):
             (5, PAG_INFO): Button(emoji=PAG_INFO, position=5, callback=partial(self._default_indexer, 'info')),
             (6, PAG_NUMBERS): Button(emoji=PAG_NUMBERS, position=6,
                                      callback=partial(self._default_indexer, 'number'))
-
         }
         self._default_stop = {(0, PAG_STOP): Button(emoji=PAG_STOP, position=0,
                                                     callback=partial(self._default_indexer, 'stop'))}
-        # self._defaults = {
-        #     (0, '⏮'): Button(emoji='⏮', position=0, callback=partial(self._default_indexer, 'start')),
-        #     (1, '◀'): Button(emoji='◀', position=1, callback=partial(self._default_indexer, -1)),
-        #     (2, '▶'): Button(emoji='▶', position=2, callback=partial(self._default_indexer, +1)),
-        #     (3, '⏭'): Button(emoji='⏭', position=3, callback=partial(self._default_indexer, 'end')),
-        #     (4, '⏹'): Button(emoji='⏹', position=4, callback=partial(self._default_indexer, 'stop'))
-        # }
-        # self._default_stop = {(0, '⏹'): Button(emoji='⏹', position=0,
-        #                                        callback=partial(self._default_indexer, 'stop'))}
 
         if title and change_title:
             raise ValueError("Both title and change_title were passed")
@@ -424,7 +414,7 @@ class Paginator(Session):
 
                 except ValueError:
                     em = discord.Embed(
-                        description=f'{ERROR} Invalid page number given.\n'
+                        description=f'{CROSS} Invalid page number given.\n'
                                     f'```Page must be between 1 and {len(self._pages)}```',
                         colour=RED)
                     return await ctx.send(embed=em)
@@ -432,7 +422,7 @@ class Paginator(Session):
                 if (len(self._pages) < _int or
                         _int < 1):
                     em = discord.Embed(
-                        description=f'{ERROR} Invalid page number given.\n'
+                        description=f'{CROSS} Invalid page number given.\n'
                                     f'```Page must be between 1 and {len(self._pages)}```',
                         colour=RED)
                     return await ctx.send(embed=em)
@@ -547,10 +537,10 @@ class ConfirmationMenu:
         )
         msg = await ctx.send(embed=em)
         await msg.add_reaction(CHECK)
-        await msg.add_reaction(ERROR)
+        await msg.add_reaction(CROSS)
 
         def check(r, u):
-            return u == ctx.author and str(r.emoji) in (CHECK, ERROR)
+            return u == ctx.author and str(r.emoji) in (CHECK, CROSS)
 
         try:
             reaction, user = await ctx.bot.wait_for('reaction_add', timeout=30.0, check=check)

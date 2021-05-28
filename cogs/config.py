@@ -87,7 +87,7 @@ class Config(commands.Cog):
         try:
             if prefix in flatten(data['prefix']):
                 em = SaturnEmbed(
-                    description=f"{ERROR} `{prefix}` is already a registered prefix.",
+                    description=f"{CROSS} `{prefix}` is already a registered prefix.",
                     colour=RED)
                 return await ctx.send(embed=em)
 
@@ -103,7 +103,7 @@ class Config(commands.Cog):
 
         if len(prefixes) > 10:
             em = SaturnEmbed(
-                description=f"{ERROR} Your guild does not have any prefixes!",
+                description=f"{CROSS} Your guild does not have any prefixes!",
                 colour=RED)
             return await ctx.send(embed=em)
 
@@ -127,13 +127,13 @@ class Config(commands.Cog):
         try:
             if not data or len(data['prefix']) < 1:
                 em = SaturnEmbed(
-                    description=f"{ERROR} Your guild does not have any prefixes!",
+                    description=f"{CROSS} Your guild does not have any prefixes!",
                     colour=RED)
                 return await ctx.send(embed=em)
 
         except (TypeError, KeyError):
             em = SaturnEmbed(
-                description=f"{ERROR} Your guild does not have any prefixes!",
+                description=f"{CROSS} Your guild does not have any prefixes!",
                 colour=RED)
             return await ctx.send(embed=em)
 
@@ -141,7 +141,7 @@ class Config(commands.Cog):
 
         if prefix not in prefixes:
             em = SaturnEmbed(
-                    description=f"{ERROR} `{prefix}` is not registered as a prefix.",
+                    description=f"{CROSS} `{prefix}` is not registered as a prefix.",
                     colour=RED)
             return await ctx.send(embed=em)
 
@@ -154,7 +154,7 @@ class Config(commands.Cog):
 
             except ValueError:
                 em = SaturnEmbed(
-                    description=f"{ERROR} `{prefix}` is not registered as a prefix.",
+                    description=f"{CROSS} `{prefix}` is not registered as a prefix.",
                     colour=RED)
                 return await ctx.send(embed=em)
 
@@ -203,7 +203,7 @@ class Config(commands.Cog):
             mod_role = ctx.guild.get_role(data['mod_role'])
             if not mod_role:
                 em = SaturnEmbed(
-                    description=f"{ERROR} The moderator role does not exist! "
+                    description=f"{CROSS} The moderator role does not exist! "
                                 f"Run `modrole set <role>` or `modrole create`",
                     colour=RED)
                 await ctx.send(embed=em)
@@ -211,7 +211,7 @@ class Config(commands.Cog):
 
         except (TypeError, KeyError):
             em = SaturnEmbed(
-                description=f"{ERROR} The moderator role does not exist! "
+                description=f"{CROSS} The moderator role does not exist! "
                             f"Run `modrole set <role>` or `modrole create`",
                 colour=RED)
             await ctx.send(embed=em)
@@ -224,7 +224,7 @@ class Config(commands.Cog):
 
         except discord.Forbidden:
             em = SaturnEmbed(
-                description=f"{ERROR} Sorry, I couldn't execute that action.\n"
+                description=f"{CROSS} Sorry, I couldn't execute that action.\n"
                             f"```Moderator role is above my role```",
                 colour=RED)
             await ctx.send(embed=em)
@@ -232,7 +232,7 @@ class Config(commands.Cog):
 
         except discord.HTTPException:
             em = SaturnEmbed(
-                description=f"{ERROR} Whoops! Something went wrong while executing that action.",
+                description=f"{CROSS} Whoops! Something went wrong while executing that action.",
                 colour=RED)
             await ctx.send(embed=em)
             return
@@ -257,7 +257,7 @@ class Config(commands.Cog):
             mod_role = ctx.guild.get_role(data['mod_role'])
             if mod_role:
                 em = SaturnEmbed(
-                    description=f"{ERROR} The moderator role already exists"
+                    description=f"{CROSS} The moderator role already exists"
                                 f"Run `modrole set <role>` or `modrole delete`",
                     colour=RED)
                 await ctx.send(embed=em)
@@ -324,14 +324,14 @@ class Config(commands.Cog):
             mute_role = ctx.guild.get_role(data['mute_role'])
             if not mute_role:
                 em = SaturnEmbed(
-                    description=f"{ERROR} The mute role does not exist! Run `muterole set <role>` or `muterole create`",
+                    description=f"{CROSS} The mute role does not exist! Run `muterole set <role>` or `muterole create`",
                     colour=RED)
                 await ctx.send(embed=em)
                 return
 
         except (TypeError, KeyError):
             em = SaturnEmbed(
-                description=f"{ERROR} The mute role does not exist! Run `muterole set <role>` or `muterole create`",
+                description=f"{CROSS} The mute role does not exist! Run `muterole set <role>` or `muterole create`",
                 colour=RED)
             await ctx.send(embed=em)
             return
@@ -343,7 +343,7 @@ class Config(commands.Cog):
 
         except discord.Forbidden:
             em = SaturnEmbed(
-                description=f"{ERROR} Sorry, I couldn't execute that action.\n"
+                description=f"{CROSS} Sorry, I couldn't execute that action.\n"
                             f"```Muted role is above my role```",
                 colour=RED)
             await ctx.send(embed=em)
@@ -351,7 +351,7 @@ class Config(commands.Cog):
 
         except discord.HTTPException:
             em = SaturnEmbed(
-                description=f"{ERROR} Whoops! Something went wrong while executing that action.",
+                description=f"{CROSS} Whoops! Something went wrong while executing that action.",
                 colour=RED)
             await ctx.send(embed=em)
             return
@@ -376,7 +376,7 @@ class Config(commands.Cog):
             mod_role = ctx.guild.get_role(data['mute_role'])
             if mod_role:
                 em = SaturnEmbed(
-                    description=f"{ERROR} The mute role already exists! Run `muterole set <role>` or `muterole delete`",
+                    description=f"{CROSS} The mute role already exists! Run `muterole set <role>` or `muterole delete`",
                     colour=RED)
                 return await ctx.send(embed=em)
 
@@ -547,7 +547,7 @@ class Config(commands.Cog):
 
     #     if level.lower() not in ('low', 'medium', 'high', 'off'):
     #         em = SaturnEmbed(
-    #             description=f"{ERROR} Invalid level given."
+    #             description=f"{CROSS} Invalid level given."
     #                         f"```Choose between LOW, MEDIUM, HIGH and OFF```",
     #             colour=RED
     #         )
@@ -650,7 +650,7 @@ class Config(commands.Cog):
     async def set_starboard_stars(self, ctx, stars: int):
         if stars < 2:
             em = SaturnEmbed(
-                description=f"{ERROR} Minimum number of stars cannot be less than 2.",
+                description=f"{CROSS} Minimum number of stars cannot be less than 2.",
                 colour=RED)
             return await ctx.send(embed=em)
 

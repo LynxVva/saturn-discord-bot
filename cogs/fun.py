@@ -30,7 +30,14 @@ class Fun(commands.Cog):
 	async def quote_cmd(self, ctx, channel: typing.Optional[discord.TextChannel], *, quote: str):
 		channel = channel or ctx.channel
 
-		await channel.send(f'*"{quote}"*\n\n- **{ctx.author}**')
+		try:
+			await channel.send(f'> *"{quote}"*\n\n- **{ctx.author}**')
+
+		except discord.Forbidden:
+			status = SaturnEmbed(
+				description=f"{CROSS} I cannot send messages to that channel.",
+				color=RED)
+			return await ctx.send(embed=status)
 
 	@commands.command(
 		name='anonymousecho',
@@ -45,7 +52,15 @@ class Fun(commands.Cog):
 		else:
 			await ctx.message.add_reaction(CHECK)
 
-		await channel.send(f'*"{quote}"*\n\n- **Someone**')
+		try:
+			await channel.send(f'> *"{quote}"*\n\n- **Someone**')
+
+		except discord.Forbidden:
+			status = SaturnEmbed(
+				description=f"{CROSS} I cannot send messages to that channel.",
+				color=RED)
+			return await ctx.send(embed=status)
+
 
 
 	@commands.command(
@@ -59,7 +74,7 @@ class Fun(commands.Cog):
 			animal = animal or random.choice(animals)
 			if animal not in animals:
 				em = SaturnEmbed(
-					description=f"{ERROR} Could not find any facts for `{animal}`.",
+					description=f"{CROSS} Could not find any facts for `{animal}`.",
 					color=RED)
 				return await ctx.send(embed=em)
 
@@ -89,13 +104,13 @@ class Fun(commands.Cog):
 
 					if response.status == 503:
 						status = SaturnEmbed(
-							description=f"{ERROR} API is currently offline.",
+							description=f"{CROSS} API is currently offline.",
 							color=RED)
 						return await ctx.send(embed=status)
 
 					else:
 						status = SaturnEmbed(
-							description=f"{ERROR} API returned with a response status `{response.status}`",
+							description=f"{CROSS} API returned with a response status `{response.status}`",
 							color=RED)
 						return await ctx.send(embed=status)
 
@@ -123,13 +138,13 @@ class Fun(commands.Cog):
 
 				if response.status == 503:
 					status = SaturnEmbed(
-						description=f"{ERROR} API is currently offline.",
+						description=f"{CROSS} API is currently offline.",
 						color=RED)
 					await ctx.send(embed=status)
 
 				else:
 					status = SaturnEmbed(
-						description=f"{ERROR} API returned with a response status `{response.status}`",
+						description=f"{CROSS} API returned with a response status `{response.status}`",
 						color=RED)
 					await ctx.send(embed=status)
 
@@ -158,13 +173,13 @@ class Fun(commands.Cog):
 
 				if response.status == 503:
 					status = SaturnEmbed(
-						description=f"{ERROR} API is currently offline.",
+						description=f"{CROSS} API is currently offline.",
 						color=RED)
 					await ctx.send(embed=status)
 
 				else:
 					status = SaturnEmbed(
-						description=f"{ERROR} API returned with a response status `{response.status}`",
+						description=f"{CROSS} API returned with a response status `{response.status}`",
 						color=RED)
 					await ctx.send(embed=status)
 
@@ -193,13 +208,13 @@ class Fun(commands.Cog):
 
 				if response.status == 503:
 					status = SaturnEmbed(
-						description=f"{ERROR} API is currently offline.",
+						description=f"{CROSS} API is currently offline.",
 						color=RED)
 					await ctx.send(embed=status)
 
 				else:
 					status = SaturnEmbed(
-						description=f"{ERROR} API returned with a response status `{response.status}`",
+						description=f"{CROSS} API returned with a response status `{response.status}`",
 						color=RED)
 					await ctx.send(embed=status)
 
@@ -276,7 +291,7 @@ class Fun(commands.Cog):
 				await ctx.send(embed=tie)
 		else:
 			invalid_choice = SaturnEmbed(
-				description=f"{ERROR} Expected either `rock`, `paper` or `scissors`, not `{choice}`",
+				description=f"{CROSS} Expected either `rock`, `paper` or `scissors`, not `{choice}`",
 				color=RED)
 			await ctx.send(embed=invalid_choice)
 
@@ -301,7 +316,7 @@ class Fun(commands.Cog):
 
 			else:
 				em = SaturnEmbed(
-					description=f"{ERROR} {self.bot.__name__} tries to roll `{amount}` "
+					description=f"{CROSS} {self.bot.__name__} tries to roll `{amount}` "
 								f"dice but gets confused and fails.",
 					color=RED)
 				await ctx.send(embed=em)
@@ -315,7 +330,7 @@ class Fun(commands.Cog):
 
 		else:
 			em = SaturnEmbed(
-				description=f"{ERROR} {self.bot.__name__} tries to roll `{amount}` dice but gets confused and fails.",
+				description=f"{CROSS} {self.bot.__name__} tries to roll `{amount}` dice but gets confused and fails.",
 				color=RED)
 			await ctx.send(embed=em)
 
@@ -346,7 +361,7 @@ class Fun(commands.Cog):
 					 'My sources say no',
 					 'Outlook is not so good',
 					 'Very doubtful']
-		yes = [
+		yes_answers = [
 			'It is certain',
 			'It is decidedly so',
 			'Without a doubt',
@@ -359,18 +374,23 @@ class Fun(commands.Cog):
 			'Signs indicate yes',
 			'Duh... obviously yes'
 		]
-		em = SaturnEmbed(
-			title=f'The Magic {self.bot.__name__} Ball',
-			colour=ctx.author.colour,
-			timestamp=utc()
-		)
+		# em = SaturnEmbed(
+		# 	title=f'The Magic {self.bot.__name__} Ball',
+		# 	colour=ctx.author.colour,
+		# 	timestamp=utc()
+		# )
 
-		em.add_field(
-			name=question + '?',
-			value=(random.choice(responses) + '.') if ctx.author.id != 531501355601494026 else random.choice(yes))
-		em.set_thumbnail(url="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/mozilla/36"
-							 "/billiards_1f3b1.png")
-		await ctx.reply(embed=em)
+		# em.add_field(
+		# 	name=question + '?',
+		# 	value=(random.choice(responses) + '.') if ctx.author.id != 531501355601494026 else random.choice(yes))
+		# em.set_thumbnail(url="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/mozilla/36"
+		# 					 "/billiards_1f3b1.png")
+		# await ctx.reply(embed=em)
+		answer = (random.choice(responses) + '.') if ctx.author.id != 531501355601494026 else random.choice(yes_answers)
+
+		await ctx.reply(
+			content="> {0}\n> - {1}\n{2}".format(question, ctx.author.mention, answer)
+		)
 
 	@commands.command(
 		name='duel',

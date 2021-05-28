@@ -53,7 +53,7 @@ class Dev(commands.Cog):
 
         except commands.MemberNotFound:
             em = SaturnEmbed(
-                description=f"{ERROR} {member.mention} is not blacklisted from this bot.",
+                description=f"{CROSS} {member.mention} is not blacklisted from this bot.",
                 colour=RED)
             await ctx.send(embed=em)
 
@@ -169,14 +169,14 @@ async def func():
 
         if not _command:
             em = SaturnEmbed(
-                description=f"{ERROR} Command `{command}` does not exist.",
+                description=f"{CROSS} Command `{command}` does not exist.",
                 colour=RED)
             return await ctx.send(embed=em)
 
         elif ctx.command == _command or _command in [c for c in self.bot.get_cog('Dev').walk_commands()] \
                 or _command == self.bot.get_command('help'):
             em = SaturnEmbed(
-                description=f"{ERROR} This command cannot be disabled.",
+                description=f"{CROSS} This command cannot be disabled.",
                 colour=RED)
             return await ctx.send(embed=em)
 

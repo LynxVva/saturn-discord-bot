@@ -73,7 +73,7 @@ class Tags(commands.Cog):
         else:
             if not found:
                 em = SaturnEmbed(
-                    description=f"{ERROR} The tag `{name}` does not exist.",
+                    description=f"{CROSS} The tag `{name}` does not exist.",
                     colour=RED)
                 await ctx.send(embed=em)
                 return
@@ -90,7 +90,7 @@ class Tags(commands.Cog):
         for letter in name:
             if letter not in list(self.accepted_chars):
                 em = SaturnEmbed(
-                    description=f"{ERROR} The tag `{content}` contains unacceptable characters. "
+                    description=f"{CROSS} The tag `{content}` contains unacceptable characters. "
                                 f"Tag names can only contain letters, digits, hyphens and underscores.",
                     colour=RED)
                 await ctx.send(embed=em)
@@ -104,7 +104,7 @@ class Tags(commands.Cog):
         for tag in tags:
             if tag['name'] == str(name):
                 em = SaturnEmbed(
-                    description=f"{ERROR} The tag `{name}` already exists.",
+                    description=f"{CROSS} The tag `{name}` already exists.",
                     colour=RED)
                 await ctx.send(embed=em)
                 return
@@ -141,7 +141,7 @@ class Tags(commands.Cog):
 
                     else:
                         em = SaturnEmbed(
-                            description=f"{ERROR} The tag `{name}` does not belong to you.",
+                            description=f"{CROSS} The tag `{name}` does not belong to you.",
                             colour=RED)
                         await ctx.send(embed=em)
                         return
@@ -149,7 +149,7 @@ class Tags(commands.Cog):
         else:
             if not found:
                 em = SaturnEmbed(
-                    description=f"{ERROR} The tag `{name}` does not exist.",
+                    description=f"{CROSS} The tag `{name}` does not exist.",
                     colour=RED)
                 await ctx.send(embed=em)
                 return
@@ -177,7 +177,7 @@ class Tags(commands.Cog):
         else:
             if not found:
                 em = SaturnEmbed(
-                    description=f"{ERROR} The tag `{name}` does not exist.",
+                    description=f"{CROSS} The tag `{name}` does not exist.",
                     colour=RED)
                 await ctx.send(embed=em)
                 return
@@ -196,7 +196,7 @@ class Tags(commands.Cog):
         for tag in tags:
             if tag['name'] == str(new_name):
                 em = SaturnEmbed(
-                    description=f"{ERROR} A tag already exists with a name or alias `{new_name}`",
+                    description=f"{CROSS} A tag already exists with a name or alias `{new_name}`",
                     colour=RED)
                 await ctx.send(embed=em)
                 return
@@ -211,7 +211,7 @@ class Tags(commands.Cog):
 
                     else:
                         em = SaturnEmbed(
-                            description=f"{ERROR} The tag `{name}` does not belong to you.",
+                            description=f"{CROSS} The tag `{name}` does not belong to you.",
                             colour=RED)
                         await ctx.send(embed=em)
                         return
@@ -219,7 +219,7 @@ class Tags(commands.Cog):
         else:
             if not found:
                 em = SaturnEmbed(
-                    description=f"{ERROR} The tag `{name}` does not exist.",
+                    description=f"{CROSS} The tag `{name}` does not exist.",
                     colour=RED)
                 await ctx.send(embed=em)
                 return
@@ -249,7 +249,7 @@ class Tags(commands.Cog):
 
                     else:
                         em = SaturnEmbed(
-                            description=f"{ERROR} The tag `{name}` does not belong to you.",
+                            description=f"{CROSS} The tag `{name}` does not belong to you.",
                             colour=RED)
                         await ctx.send(embed=em)
                         return
@@ -257,7 +257,7 @@ class Tags(commands.Cog):
         else:
             if not found:
                 em = SaturnEmbed(
-                    description=f"{ERROR} The tag `{name}` does not exist.",
+                    description=f"{CROSS} The tag `{name}` does not exist.",
                     colour=RED)
                 await ctx.send(embed=em)
                 return
@@ -287,7 +287,7 @@ class Tags(commands.Cog):
 
                     else:
                         em = SaturnEmbed(
-                            description=f"{ERROR} The tag `{name}` does not belong to you.",
+                            description=f"{CROSS} The tag `{name}` does not belong to you.",
                             colour=RED)
                         await ctx.send(embed=em)
                         return
@@ -295,7 +295,7 @@ class Tags(commands.Cog):
         else:
             if not found:
                 em = SaturnEmbed(
-                    description=f"{ERROR} The tag `{name}` does not exist.",
+                    description=f"{CROSS} The tag `{name}` does not exist.",
                     colour=RED)
                 await ctx.send(embed=em)
                 return

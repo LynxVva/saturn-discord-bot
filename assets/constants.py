@@ -1,4 +1,5 @@
 import discord
+from discord.ext.commands.core import check
 
 # Colours, emotes, and useful stuff
 
@@ -18,10 +19,10 @@ DARKER_BLUE = 0x11618B
 # not too shabby
 BLANK = '\uFEFF'
 
-ERROR = '<:error:822122069139521567>'
-CHECK = '<:check:822122069176221726>'
-WARNING = '<:warn:818199916312002631>'
-INFO = '<:info:821565551939420170>'
+CHECK = "<:check:846787880314470470>"
+CROSS = "<:cross:846787880164917348>"
+WARNING = ":warning:"
+INFO = "<:info:846787881132621884>"
 PREFIX = "s!"
 LOCK = ':lock:'
 UNLOCK = ':unlock:'
@@ -32,14 +33,6 @@ NO_REPEAT = '⏭'
 REPEAT_ONE = '🔂'
 REPEAT_ALL = '🔁'
 
-# Pagination emotes
-# PAG_FRONT = '<:pagfront:824379359867306078>'
-# PAG_PREVIOUS = '<:pagleft:824379360324747364>'
-# PAG_NEXT = '<:pagright:824379360302596196>'
-# PAG_BACK = '<:pagback:824379493732974622>'
-# PAG_STOP = '<:pagstop:824379359564529804>'
-# PAG_NUMBERS = '<:pagnumbers:824379360194068520>'
-# PAG_INFO = '<:paginfo:824379360059850753>'
 PAG_FRONT = '⏪'
 PAG_PREVIOUS = '◀️'
 PAG_NEXT = '▶️'

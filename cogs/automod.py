@@ -307,13 +307,13 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
 
         if not toggle:
             em = SaturnEmbed(
-                description=f"{ERROR} Anti-profanity is disabled in this guild.",
+                description=f"{CROSS} Anti-profanity is disabled in this guild.",
                 colour=RED)
             return await ctx.send(embed=em)
         
         elif not len(words):
             em = SaturnEmbed(
-                description=f"{ERROR} There are no blacklisted words in this guild.",
+                description=f"{CROSS} There are no blacklisted words in this guild.",
                 colour=RED)
             return await ctx.send(embed=em)
 
@@ -368,7 +368,7 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
             data = await self.bot.config.find_one({"_id": ctx.guild.id})
             if words and word in words:
                 em = SaturnEmbed(
-                    description=f"{ERROR} That word is already recognized as a curse word.",
+                    description=f"{CROSS} That word is already recognized as a curse word.",
                     colour=RED)
                 return await ctx.send(embed=em)
 
@@ -381,7 +381,7 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
                     words = data['words']
                     if word in words:
                         em = SaturnEmbed(
-                            description=f"{ERROR} That word is already recognized as a curse word.",
+                            description=f"{CROSS} That word is already recognized as a curse word.",
                             colour=RED)
                         return await ctx.send(embed=em)
 
@@ -421,7 +421,7 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
                 words = data['words']
                 if word not in words:
                     em = SaturnEmbed(
-                        description=f"{ERROR} That word is not recognized as a curse word.",
+                        description=f"{CROSS} That word is not recognized as a curse word.",
                         colour=RED)
                     return await ctx.send(embed=em)
 
@@ -507,7 +507,7 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
 
         if member.id in whitelist:
             em = SaturnEmbed(
-                description=f"{ERROR} {member.mention} is already whitelisted.",
+                description=f"{CROSS} {member.mention} is already whitelisted.",
                 colour=RED)
             return await ctx.send(embed=em)
 
@@ -531,7 +531,7 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
         try:
             if not data['spam_whitelist']:
                 em = SaturnEmbed(
-                    description=f"{ERROR} There are no whitelists in this guild.",
+                    description=f"{CROSS} There are no whitelists in this guild.",
                     colour=RED)
                 return await ctx.send(embed=em)
 
@@ -540,13 +540,13 @@ class AutoMod(commands.Cog, name='Auto Moderation'):
 
         except (TypeError, KeyError):
             em = SaturnEmbed(
-                description=f"{ERROR} There are no whitelists in this guild.",
+                description=f"{CROSS} There are no whitelists in this guild.",
                 colour=RED)
             return await ctx.send(embed=em)
 
         if member.id not in whitelist:
             em = SaturnEmbed(
-                description=f"{ERROR} {member.mention} is not whitelisted.",
+                description=f"{CROSS} {member.mention} is not whitelisted.",
                 colour=RED)
             return await ctx.send(embed=em)
 

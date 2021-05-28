@@ -112,7 +112,7 @@ class Help(commands.Cog):
         # command signature, description, cooldown, checks and stuff on command paginator
 
         if not entity:
-            await ctx.send(
+            quick_links = await ctx.send(
                 # content=SUPPORT_SERVER,
                 embed=discord.Embed(
                     title="Quick Links",
@@ -208,7 +208,7 @@ class Help(commands.Cog):
             # TODO: Fix syntax
 
             em = SaturnEmbed(
-                description=f"{ERROR} Command/module `{entity}` does not exist (or is not listed).",
+                description=f"{CROSS} Command/module `{entity}` does not exist (or is not listed).",
                 colour=RED)
             await ctx.send(embed=em)
 

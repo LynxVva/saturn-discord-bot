@@ -37,7 +37,7 @@ class Management(commands.Cog, name='Server Management'):
 
             else:
                 em = SaturnEmbed(
-                    description=f"{ERROR} You are not high enough in the role"
+                    description=f"{CROSS} You are not high enough in the role"
                                 f" hierarchy to perform this action.",
                     colour=RED)
                 await ctx.send(embed=em)
@@ -45,7 +45,7 @@ class Management(commands.Cog, name='Server Management'):
 
         else:
             em = SaturnEmbed(
-                description=f"{ERROR} I am not high enough in the member"
+                description=f"{CROSS} I am not high enough in the member"
                             f" hierarchy to perform this action.",
                 colour=RED)
             await ctx.send(embed=em)
@@ -136,7 +136,7 @@ class Management(commands.Cog, name='Server Management'):
 
             else:
                 em = SaturnEmbed(
-                    description=f"{ERROR} You are not high enough in the role"
+                    description=f"{CROSS} You are not high enough in the role"
                                 f" hierarchy to perform this action.",
                     colour=RED)
                 await ctx.send(embed=em)
@@ -144,7 +144,7 @@ class Management(commands.Cog, name='Server Management'):
 
         else:
             em = SaturnEmbed(
-                description=f"{ERROR} I am not high enough in the member"
+                description=f"{CROSS} I am not high enough in the member"
                             f" hierarchy to perform this action.",
                 colour=RED)
             await ctx.send(embed=em)
@@ -241,7 +241,7 @@ class Management(commands.Cog, name='Server Management'):
 
             except discord.HTTPException:
                 em = SaturnEmbed(
-                    description=f"{ERROR} I cannot delete that category.",
+                    description=f"{CROSS} I cannot delete that category.",
                     colour=RED)
                 await ctx.send(embed=em)
 
@@ -265,7 +265,7 @@ class Management(commands.Cog, name='Server Management'):
 
             except discord.HTTPException:
                 em = SaturnEmbed(
-                    description=f"{ERROR} I cannot delete that channel.",
+                    description=f"{CROSS} I cannot delete that channel.",
                     colour=RED)
                 await ctx.send(embed=em)
 
@@ -288,7 +288,7 @@ class Management(commands.Cog, name='Server Management'):
 
             except discord.HTTPException:
                 em = SaturnEmbed(
-                    description=f"{ERROR} I cannot delete that role.",
+                    description=f"{CROSS} I cannot delete that role.",
                     colour=RED)
                 await ctx.send(embed=em)
 
