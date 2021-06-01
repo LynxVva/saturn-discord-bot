@@ -1,3 +1,4 @@
+from discord.channel import TextChannel
 from assets.cmd import get_permissions
 import re
 import os
@@ -9,8 +10,10 @@ from discord.errors import HTTPException
 from assets import *
 from dateutil.relativedelta import relativedelta
 from discord.ext import tasks
+import textwrap
 
 log = logging.getLogger(__name__)
+
 
 async def create_export_file(bot, ctx, messages, channel):
     try:
@@ -28,7 +31,8 @@ async def create_export_file(bot, ctx, messages, channel):
 
 async def _create_efile(bot, ctx, messages, channel):
     with open(f'{bot.path}/assets/txt_files/{channel.id}-export.txt', 'w', encoding='utf-8') as f:
-        f.write(f"{len(messages)} messages exported from the #{channel} channel by {ctx.author}:\n\n")
+        f.write(
+            f"{len(messages)} messages exported from the #{channel} channel by {ctx.author}:\n\n")
         for message in messages:
             content = message.clean_content
             if not message.author.bot:
@@ -40,8 +44,10 @@ async def _create_efile(bot, ctx, messages, channel):
                 f.write(f"{message.author} {convert_to_timestamp(message.created_at)} EST"
                         f" (ID - {message.author.id})\n"
                         f"{'Embed/file sent by a bot' if not content else content}\n\n")
-    
+
 # noinspection SpellCheckingInspection
+
+
 class Utility(commands.Cog):
     """
     The Utility module. Includes useful things, like starboards and modmail.
@@ -52,7 +58,8 @@ class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.polls = {}
-        self.numbers = ('1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟')
+        self.numbers = ('1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣',
+                        '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟')
         self.snipe_task = self.clear_snipe_cache.start()
 
     def cog_unload(self):
@@ -85,13 +92,13 @@ class Utility(commands.Cog):
 
         if not choices:
             em = SaturnEmbed(
-                description=f"{ERROR} Please include both a question and choices.",
+                description=f"{CROSS} Please include both a question and choices.",
                 color=RED)
             return await ctx.send(embed=em)
 
         if len(choices) > 10 or len(choices) < 2:
             em = SaturnEmbed(
-                description=f"{ERROR} The amount of choices provided is not within acceptable boundaries.\n"
+                description=f"{CROSS} The amount of choices provided is not within acceptable boundaries.\n"
                             f"```Number of choices must be in between 1 and 10```",
                 color=RED)
             return await ctx.send(embed=em)
@@ -99,7 +106,8 @@ class Utility(commands.Cog):
         em = SaturnEmbed(
             title=question,
             description='\n\n'.join(
-                ["{0} {1}".format(self.numbers[num], choice.replace('"', '')) for num, choice in enumerate(choices)]
+                ["{0} {1}".format(self.numbers[num], choice.replace('"', ''))
+                 for num, choice in enumerate(choices)]
             ),
             colour=MAIN,
             timestamp=utc()
@@ -129,9 +137,11 @@ class Utility(commands.Cog):
         description="Show the results of a poll."
     )
     async def show_poll_results(self, ctx, poll_id):
-        if re.search(MESSAGE_LINK_REGEX, str(poll_id)): # discord message url like https://discord.com/channels/num/num/num
+        # discord message url like https://discord.com/channels/num/num/num
+        if re.search(MESSAGE_LINK_REGEX, str(poll_id)):
             items = poll_id.split('/')[4:]
-            guild_id, channel_id, message_id = ctx.guild.id, int(items[1]), int(items[2])
+            guild_id, channel_id, message_id = ctx.guild.id, int(
+                items[1]), int(items[2])
 
             if await self.bot.get_guild(guild_id).get_channel(channel_id).fetch_message(message_id):
                 return await self.show_poll(ctx, message_id, channel_id)
@@ -139,21 +149,21 @@ class Utility(commands.Cog):
         else:
             # if await self.bot.get_channel(items[1]).fetch_message(items[2]):
             #     return await self.show_poll(items[2], items[1])
-            # try:   
+            # try:
             #     if len(str(poll_id)) == 18 and self.polls[poll_id]:
             #         try:
             #             message = await ctx.fetch_message(poll_id)
             #             if not message:
             #                 em = SaturnEmbed(
-            #                     description=f"{ERROR} No poll with an id of `{poll_id}` was found.",
+            #                     description=f"{CROSS} No poll with an id of `{poll_id}` was found.",
             #                     color=RED)
-            #                 return await ctx.send(embed=em) 
+            #                 return await ctx.send(embed=em)
 
             #         except discord.NotFound:
             #             em = SaturnEmbed(
-            #                 description=f"{ERROR} A poll with an id of `{poll_id}` was found, but the message does not exist anymore.",
+            #                 description=f"{CROSS} A poll with an id of `{poll_id}` was found, but the message does not exist anymore.",
             #                 color=RED)
-            #             await ctx.send(embed=em) 
+            #             await ctx.send(embed=em)
 
             #             try:
             #                 return self.polls.pop(poll_id)
@@ -166,18 +176,18 @@ class Utility(commands.Cog):
 
             # except KeyError:
             #     em = SaturnEmbed(
-            #         description=f"{ERROR} No poll with an id of `{poll_id}` was found.",
+            #         description=f"{CROSS} No poll with an id of `{poll_id}` was found.",
             #         color=RED)
             #     return await ctx.send(embed=em)
 
             em = SaturnEmbed(
-                description=f"{ERROR} No poll with an id of `{poll_id}` was found.",
+                description=f"{CROSS} No poll with an id of `{poll_id}` was found.",
                 color=RED)
             await ctx.send(embed=em)
 
     async def show_poll(self, ctx, message_id, channel_id):
         message = await self.bot.get_guild(ctx.guild.id).get_channel(channel_id).fetch_message(message_id)
-        message_reactions = message.reactions 
+        message_reactions = message.reactions
         _poll = self.polls[message.id]
 
         for reaction in message_reactions:
@@ -195,10 +205,9 @@ class Utility(commands.Cog):
 
             # else:
             #     print("nvm we good lol", reaction)
-        
+
         print(message_reactions)
 
-        
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         if self.bot.ready:
@@ -207,9 +216,9 @@ class Utility(commands.Cog):
                     message = await self.bot.get_channel(payload.channel_id).fetch_message(payload.message_id)
 
                     for reaction in message.reactions:
-                        if (not payload.member.bot and 
+                        if (not payload.member.bot and
                             payload.member in await reaction.users().flatten() and
-                            reaction.emoji != payload.emoji.name):
+                                reaction.emoji != payload.emoji.name):
 
                             await message.remove_reaction(reaction.emoji, payload.member)
 
@@ -233,7 +242,6 @@ class Utility(commands.Cog):
                 colour=MAIN
             )
         )
-
 
     @commands.command(
         name='ping',
@@ -278,9 +286,11 @@ class Utility(commands.Cog):
     async def member_count(self, ctx):
         async with ctx.channel.typing():
             bots = len([m for m in ctx.guild.members if m.bot])
-            bots_with_perms = len([m for m in ctx.guild.members if m.bot and m.guild_permissions.kick_members])
+            bots_with_perms = len(
+                [m for m in ctx.guild.members if m.bot and m.guild_permissions.kick_members])
             users = len(ctx.guild.members) - bots
-            mods = len([m for m in ctx.guild.members if m.guild_permissions.kick_members]) - bots_with_perms
+            mods = len(
+                [m for m in ctx.guild.members if m.guild_permissions.kick_members]) - bots_with_perms
 
             em = SaturnEmbed(
                 colour=MAIN,
@@ -291,35 +301,41 @@ class Utility(commands.Cog):
             **Bots** - {bots}
             **Moderators** - {mods}
             """
-            em.set_author(name=f'Member Statistics for {ctx.guild}', icon_url=ctx.guild.icon_url)
+            em.set_author(
+                name=f'Member Statistics for {ctx.guild}', icon_url=ctx.guild.icon_url)
             await ctx.send(embed=em)
 
-    @commands.command(name="userinfo",
-                      aliases=["memberinfo", "ui", "mi"],
-                      description='Information about a user')
+    @commands.command(
+        name="userinfo",
+        aliases=["memberinfo", "ui", "mi"],
+        description='Information about a user')
     @commands.cooldown(1, 2, commands.BucketType.member)
     async def user_info(self, ctx, member: typing.Optional[typing.Union[discord.Member, discord.User]]):
         member = member or ctx.author
 
         embed = SaturnEmbed(
             description=member.mention,
-            colour=member.colour if isinstance(member, discord.Member) else MAIN,
+            colour=member.colour if isinstance(
+                member, discord.Member) else MAIN,
             timestamp=utc())
 
         embed.set_thumbnail(url=member.avatar_url)
         embed.set_author(icon_url=member.avatar_url, name=member)
-            
+
         created_delta = (utc() - member.created_at.replace(
             tzinfo=datetime.timezone.utc)).total_seconds()
 
         embed.add_field(name="ID", value=member.id)
-        embed.add_field(name="Joined Discord", value=general_convert_time(created_delta) + ' ago', inline=True)
+        embed.add_field(name="Joined Discord", value=general_convert_time(
+            created_delta) + ' ago', inline=True)
         if isinstance(member, discord.Member):
-            join_delta = (utc() - member.joined_at.replace(tzinfo=datetime.timezone.utc)).total_seconds()
+            join_delta = (
+                utc() - member.joined_at.replace(tzinfo=datetime.timezone.utc)).total_seconds()
             member_roles = member.roles[1:]
             roles = " ".join(reversed([f"<@&{r.id}>" for r in member_roles]))
 
-            embed.add_field(name=f"Joined {ctx.guild}", value=general_convert_time(join_delta) + ' ago', inline=True)
+            embed.add_field(name=f"Joined {ctx.guild}", value=general_convert_time(
+                join_delta) + ' ago', inline=True)
             if roles:
                 embed.add_field(
                     name="Roles ({})".format(int(len(member_roles))),
@@ -333,9 +349,10 @@ class Utility(commands.Cog):
                 if value:
                     display_perms.append(
                         ' '.join(
-                            [item.title() for item in str(permission).split('_')]
-                            )
+                            [item.title()
+                             for item in str(permission).split('_')]
                         )
+                    )
 
                 continue
 
@@ -346,14 +363,81 @@ class Utility(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.command(
+        name='serverinfo',
+        aliases=['si', 'gi', 'guildinfo']
+    )
+    @commands.cooldown(1, 2, commands.BucketType.member)
+    async def server_info(self, ctx):
+        guild = ctx.guild
+        em = SaturnEmbed(
+            colour=MAIN,
+        )
+        em.set_author(name=guild.name, icon_url=guild.icon_url)
+        em.set_thumbnail(url=guild.icon_url)
+
+        if guild.banner:
+            em.set_image(url=guild.banner_url)
+
+        em.add_field(name="Server ID", value=guild.id, inline=True)
+        em.add_field(name="Server Owner",
+                     value=guild.owner.mention, inline=True)
+        if guild.description:
+            em.add_field(name="Description", value=guild.description)
+
+        online = len([member for member in guild.members if not (
+            member.status == discord.Status.offline)])
+        offline = len(guild.members) - online
+
+        em.add_field(name="Member Count ({})".format(len(guild.members)), value="{2} {0} online\n{3} {1} offline".format(
+            online, offline, ONLINE, OFFLINE))
+
+        text_channels = len([channel for channel in guild.channels if isinstance(
+            channel, discord.TextChannel)])
+
+        voice_channels = len([channel for channel in guild.channels if isinstance(
+            channel, discord.VoiceChannel)])
+
+        stage_channels = len([channel for channel in guild.channels if isinstance(
+            channel, discord.StageChannel)])
+
+        em.add_field(name="Channel Count ({})".format(text_channels + voice_channels + stage_channels),
+                     value="{3} {0} text \n{4} {1} voice\n{5} {2} stage".format(
+            text_channels, voice_channels, stage_channels, TEXT_CHANNEL, VOICE_CHANNEL, STAGE_CHANNEL))
+        em.add_field(name="Role Count", value=len(guild.roles), inline=True)
+        em.add_field(name="Emoji Count", value=len(guild.emojis), inline=True)
+
+        em.add_field(name="Ban Count", value="{} {}".format(
+            BAN_HAMMER, len(await guild.bans())))
+
+        boosts = guild.premium_subscription_count
+        if boosts < 2:
+            boost_level = 0
+
+        elif 15 > boosts >= 2:
+            boost_level = 1
+
+        elif 30 > boosts >= 15:
+            boost_level = 2
+
+        else:
+            boost_level = 3
+
+        em.add_field(name="Boost Count",
+                     value="{} {} (Level {} Perks)".format(BOOST, boosts, boost_level))
+        em.add_field(name="Server Perks", value="\n".join(
+            [str(feature.split('_')).title()[2:-2] for feature in guild.features]))
+
+        await ctx.send(embed=em)
+
     # TODO: add reminder command yay
 
-    @commands.command(
+    @ commands.command(
         name='source',
         aliases=['code', 'src'],
         description='Show the source link to Saturn\'s code.'
     )
-    @commands.cooldown(1, 2, commands.BucketType.member)
+    @ commands.cooldown(1, 2, commands.BucketType.member)
     async def view_bot_source(self, ctx):
         em = SaturnEmbed(
             description=f'[Click here]({self.bot.src}) to view the source code.',
@@ -364,7 +448,7 @@ class Utility(commands.Cog):
             icon_url=self.bot.user.avatar_url)
         await ctx.send(embed=em)
 
-    @commands.command(
+    @ commands.command(
         name='roles',
         description='View your roles.'
     )
@@ -374,17 +458,20 @@ class Utility(commands.Cog):
 
         roles = " ".join(reversed([f"<@&{r.id}>" for r in member.roles[1:]]))
         em = SaturnEmbed(
-            description=str(roles if roles else f"{member.mention} has no roles!"),
+            description=str(
+                roles if roles else f"{member.mention} has no roles!"),
             colour=member.colour,
             timestamp=utc()
         )
         em.set_image(url=member.avatar_url)
-        em.set_author(icon_url=member.avatar_url, name=f"{member.name}'s roles")
+        em.set_author(icon_url=member.avatar_url,
+                      name=f"{member.name}'s roles")
         await ctx.send(embed=em)
 
     @commands.command(
         name='export',
-        aliases=['channelcontents', 'export-contents', 'exportcontents', 'downloadchannelcontents', 'dcc'],
+        aliases=['channelcontents', 'export-contents',
+                 'exportcontents', 'downloadchannelcontents', 'dcc'],
         description="Export a channel's content into a .txt file."
     )
     @commands.has_permissions(manage_messages=True)
@@ -406,8 +493,9 @@ class Utility(commands.Cog):
             except FileNotFoundError:
                 await asyncio.sleep(0.5)
                 await create_export_file(self.bot, ctx, messages, channel)
-            
-            file = discord.File(f'{self.bot.path}/assets/txt_files/{channel.id}-export.txt')
+
+            file = discord.File(
+                f'{self.bot.path}/assets/txt_files/{channel.id}-export.txt')
 
         await msg.delete()
         em = SaturnEmbed(
