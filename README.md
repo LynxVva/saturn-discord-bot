@@ -11,8 +11,8 @@ Self hosting is generally not recommended, but this might change in the future. 
 If you decide you do want to contribue, then your contribution is appreciated.
 Below are the steps to get the repository set up.
 ```
-$ git clone https://github.com/Synchronous/keypress
-$ cd keypress
+$ git clone https://github.com/Synchronous/saturn
+$ cd saturn
 $ py -3 -m pip install -r requirements.txt
 $ py saturn.py
 ```
