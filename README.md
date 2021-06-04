@@ -7,6 +7,16 @@ A multipurpose discord bot made in python.
 # Self Hosting
 Self hosting is generally not recommended, but this might change in the future. For now, please invite the bot with the link above.
 
+# Contributing
+Don't. Unless you want to, as said before, this is completely a joke. 
+However, if you decide you do want to contribue, then your contribution is appreciated.
+```
+$ git clone https://github.com/Synchronous/keypress
+$ cd keypress
+$ py -3 -m pip install -r requirements.txt
+$ py saturn.py
+```
+
 # Requirements
 |Package   |Version   |
 |---|---|
