@@ -1,3 +1,4 @@
+from assets.time import convert_to_timestamp, general_convert_time, utc
 from discord.channel import TextChannel
 from assets.cmd import get_permissions
 import re
@@ -83,19 +84,19 @@ class Utility(commands.Cog):
     @commands.group(
         name='poll',
         aliases=['pl', 'question'],
-        description="Start a poll for others to vote on.",
+        description="Start a poll for others to vote on. The questions",
         invoke_without_command=True
     )
     @commands.cooldown(1, 3, commands.BucketType.member)
     async def poll(self, ctx, channel: typing.Optional[discord.TextChannel], question, *choices):
         channel = channel or ctx.channel
 
-        if not choices:
+        if not len(choices) or not len(question):
             em = SaturnEmbed(
-                description=f"{CROSS} Please include both a question and choices.",
+                description=f"{CROSS} Please include both a question and choices. Format looks like\n"
+                            f'```poll "dogs or cats?" dogs cats```',
                 color=RED)
             return await ctx.send(embed=em)
-
         if len(choices) > 10 or len(choices) < 2:
             em = SaturnEmbed(
                 description=f"{CROSS} The amount of choices provided is not within acceptable boundaries.\n"
@@ -114,7 +115,6 @@ class Utility(commands.Cog):
         )
         em.set_footer(text=f"Poll by {ctx.author.name}")
         msg = await channel.send(embed=em)
-
         self.polls[msg.id] = {
             "question": question,
             "choices": choices,
@@ -122,7 +122,6 @@ class Utility(commands.Cog):
             "author": ctx.author.id,
             "guild": ctx.guild.id,
         }
-
         valid_emotes = self.numbers[:(len(choices))]
         for emoji in valid_emotes:
             await msg.add_reaction(emoji)
@@ -142,71 +141,78 @@ class Utility(commands.Cog):
             items = poll_id.split('/')[4:]
             guild_id, channel_id, message_id = ctx.guild.id, int(
                 items[1]), int(items[2])
-
-            if await self.bot.get_guild(guild_id).get_channel(channel_id).fetch_message(message_id):
-                return await self.show_poll(ctx, message_id, channel_id)
-
+            try:
+                if await self.bot.get_guild(guild_id).get_channel(channel_id).fetch_message(message_id) and self.polls[message_id]:
+                    return await self.show_poll(ctx, message_id, channel_id)
+            except (KeyError, discord.NotFound):
+                pass
+            em = SaturnEmbed(
+                description=f"{CROSS} No poll with an id of `{message_id}` was found.",
+                color=RED)
+            return await ctx.send(embed=em)
         else:
-            # if await self.bot.get_channel(items[1]).fetch_message(items[2]):
-            #     return await self.show_poll(items[2], items[1])
-            # try:
-            #     if len(str(poll_id)) == 18 and self.polls[poll_id]:
-            #         try:
-            #             message = await ctx.fetch_message(poll_id)
-            #             if not message:
-            #                 em = SaturnEmbed(
-            #                     description=f"{CROSS} No poll with an id of `{poll_id}` was found.",
-            #                     color=RED)
-            #                 return await ctx.send(embed=em)
-
-            #         except discord.NotFound:
-            #             em = SaturnEmbed(
-            #                 description=f"{CROSS} A poll with an id of `{poll_id}` was found, but the message does not exist anymore.",
-            #                 color=RED)
-            #             await ctx.send(embed=em)
-
-            #             try:
-            #                 return self.polls.pop(poll_id)
-
-            #             except ValueError:
-            #                 return
-
-            #         else:
-            #             return await self.show_poll(message.id, message.channel.id)
-
-            # except KeyError:
-            #     em = SaturnEmbed(
-            #         description=f"{CROSS} No poll with an id of `{poll_id}` was found.",
-            #         color=RED)
-            #     return await ctx.send(embed=em)
-
+            try:
+                if self.polls[int(poll_id)]:
+                    poll = self.polls[int(poll_id)]
+                    if poll["guild"] == ctx.guild.id:
+                        return await self.show_poll(ctx, int(poll_id), poll["channel"])
+            except (ValueError, KeyError):
+                em = SaturnEmbed(
+                    description=f"{CROSS} No poll with an id of `{poll_id}` was found.",
+                    color=RED)
+                return await ctx.send(embed=em)
             em = SaturnEmbed(
                 description=f"{CROSS} No poll with an id of `{poll_id}` was found.",
                 color=RED)
             await ctx.send(embed=em)
 
+    async def get_poll_results(self, percent):
+        WHITE_SQUARE = "<:white_rectangle_vote:850463534638170172>"
+        BLACK_SQUARE = "<:black_rectangle_vote:850463519538544740>"
+
+        return (BLACK_SQUARE * percent) + (WHITE_SQUARE * (10 - percent))
+
     async def show_poll(self, ctx, message_id, channel_id):
         message = await self.bot.get_guild(ctx.guild.id).get_channel(channel_id).fetch_message(message_id)
-        message_reactions = message.reactions
         _poll = self.polls[message.id]
+        reactions = []
 
-        for reaction in message_reactions:
-            if reaction.custom_emoji:
-                message_reactions.remove(reaction)
+        index = 0
+        for reaction in message.reactions:
+            index += 1
+            if str(reaction.emoji) in self.numbers:
+                reactions.append(reaction)
 
-            elif reaction.emoji not in self.numbers:
-                message_reactions.remove(reaction)
+        em = SaturnEmbed(
+            title=_poll["question"],
+            colour=MAIN,
+            timestamp=utc()
+        )
+        total_votes = 0
+        for reaction in reactions:
+            for user in await reaction.users().flatten():
+                if not user.bot:
+                    total_votes += 1
 
-            print(message_reactions)
+        for num, choice in enumerate(_poll["choices"]):
+            count = len(
+                [user for user in await reactions[num].users().flatten() if not user.bot])
 
-            # if (reaction.emoji not in self.numbers) or (reaction.custom_emoji == True):
-            #     print("uh oh dis not a emoji", reaction)
-            #     message_reactions.remove(reaction)
+            try:
+                tens_percentage = round((count / total_votes) * 10)
+                total_percentage = round(count / total_votes * 100)
 
-            # else:
-            #     print("nvm we good lol", reaction)
+            except ZeroDivisionError:
+                tens_percentage, total_percentage = 0, 0
 
-        print(message_reactions)
+            em.add_field(
+                name=choice.replace('"', ''),
+                value="{} {} votes (**{}%**)".format(await self.get_poll_results(tens_percentage), count, total_percentage)
+            )
+
+        em.set_footer(text="Poll by {}".format(
+            ctx.guild.get_member(_poll["author"])))
+        await ctx.send(embed=em)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -227,7 +233,7 @@ class Utility(commands.Cog):
             except KeyError:
                 pass
 
-    @commands.command(
+    @ commands.command(
         name='uptime',
         aliases=['onlinesince', 'onlinetime'],
         description='Check the bot\'s uptime.'
