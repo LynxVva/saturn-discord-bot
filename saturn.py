@@ -1,3 +1,4 @@
+from assets.time import utc
 from discord.errors import Forbidden
 from assets.cmd import get_permissions, get_prefix
 import os
@@ -15,9 +16,11 @@ load_dotenv()
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(module)s | %(message)s")
+formatter = logging.Formatter(
+    "%(asctime)s | %(levelname)s | %(module)s | %(message)s")
 
-handler = logging.FileHandler(filename='saturn.log', encoding='utf-8', mode='w')
+handler = logging.FileHandler(
+    filename='saturn.log', encoding='utf-8', mode='w')
 handler.setFormatter(formatter)
 
 logger.addHandler(handler)
@@ -35,8 +38,9 @@ class Saturn(commands.Bot):
             description="A multipurpose discord bot made in python.",
             intents=intents,
             case_insensitive=True,
-            owner_ids=[int(owner_id) for owner_id in os.environ.get("OWNERIDS").split(" ")],
-            allowed_mentions=mentions   
+            owner_ids=[int(owner_id)
+                       for owner_id in os.environ.get("OWNERIDS").split(" ")],
+            allowed_mentions=mentions
         )
         self.ready = False
         self.__name__ = 'Saturn'
@@ -54,7 +58,8 @@ class Saturn(commands.Bot):
         self.muted_users = {}
         self.message_cache = {}
 
-        self.mongo = motor.motor_asyncio.AsyncIOMotorClient(str(self.mongo_connection_url))
+        self.mongo = motor.motor_asyncio.AsyncIOMotorClient(
+            str(self.mongo_connection_url))
         self.db = self.mongo[self.__name__]
         self.config = self.db["config"]
         self.mutes = self.db["mutes"]
@@ -92,7 +97,7 @@ class Saturn(commands.Bot):
 
         if ctx.command and ctx.guild:
             perms = await get_permissions(ctx, ctx.guild.me)
-            
+
             if not perms['send_messages']:
                 em = SaturnEmbed(
                     description=f"{WARNING} Oops! I can't send messages! Please update my permissions and try again.",
@@ -102,14 +107,20 @@ class Saturn(commands.Bot):
             elif not perms['embed_links']:
                 return await ctx.send("Hey! Please enable the `Embed Links` permission for me!")
 
+            elif not perms['manage_messages']:
+                em = SaturnEmbed(
+                    description=f"{WARNING} I need to be able to delete messages! Please enable that permission.",
+                    colour=GOLD)
+                return await ctx.send(embed=em)
+
             elif (
-                    (not perms['external_emojis']) or 
-                    (not perms['attach_files']) or
-                    (not perms['add_reactions'])
-                 ):
+                (not perms['external_emojis']) or
+                (not perms['attach_files']) or
+                (not perms['add_reactions'])
+            ):
                 em = SaturnEmbed(
                     description=f"{WARNING} Oops! Please make sure that I have the following permissions:"
-                                f"```Send Messages, Embed Links, Use External Emojis, Attach Files, Add Reactions```",
+                                f"```Send Messages, Embed Links, Use External Emojis, Attach Files, Add Reactions, Manage Messages```",
                     colour=GOLD)
                 return await ctx.send(embed=em)
 
@@ -146,16 +157,22 @@ class Saturn(commands.Bot):
             for _file in os.listdir(self.path + '/cogs'):
                 if _file.endswith('.py') and not _file.startswith('_'):
                     print(f"Loading {_file[:-3]} cog...")
-                    self.load_extension(f"cogs.{_file[:-3]}")  # load all of the cogs
+                    # load all of the cogs
+                    self.load_extension(f"cogs.{_file[:-3]}")
 
-            self.load_extension('jishaku')  # i have jishaku here because i find it quite useful
+            # i have jishaku here because i find it quite useful
+            self.load_extension('jishaku')
 
             mutes, bans = [], []
             print("Initializing mute and ban cache...")
-            async for _doc in self.mutes.find({}): mutes.append(_doc)
-            for mute in mutes: self.muted_users[mute["_id"]] = mute
-            async for _doc in self.bans.find({}): bans.append(_doc)
-            for ban in bans: self.banned_users[ban["_id"]] = ban
+            async for _doc in self.mutes.find({}):
+                mutes.append(_doc)
+            for mute in mutes:
+                self.muted_users[mute["_id"]] = mute
+            async for _doc in self.bans.find({}):
+                bans.append(_doc)
+            for ban in bans:
+                self.banned_users[ban["_id"]] = ban
 
             print(f"{self.__name__} is ready")
             em = SaturnEmbed(
@@ -183,5 +200,6 @@ if __name__ == '__main__':
     # Load all of the cogs and initialize the databases
     Saturn = Saturn()
     Saturn.run()  # run the bot
-    print("Event loop closed.")  # I can do this because it will not print until the event loop stops
+    # I can do this because it will not print until the event loop stops
+    print("Event loop closed.")
     # all processes after this will not be run until the bot stops so oof

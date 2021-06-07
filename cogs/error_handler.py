@@ -6,17 +6,21 @@ from assets.cmd import *
 import traceback
 import sys
 
-log = logging.getLogger(__name__) 
+log = logging.getLogger(__name__)
+
 
 class ErrorHandler(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     async def raise_exception(self, exc, ctx: commands.Context) -> None:
-        print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-        _traceback = traceback.print_exception(type(exc), exc, exc.__traceback__, file=sys.stderr)
-        tb = ''.join(traceback.format_exception(type(exc), exc, exc.__traceback__))
-        
+        print('Ignoring exception in command {}:'.format(
+            ctx.command), file=sys.stderr)
+        traceback.print_exception(
+            type(exc), exc, exc.__traceback__, file=sys.stderr)
+        tb = ''.join(traceback.format_exception(
+            type(exc), exc, exc.__traceback__))
+
         paste = await self.bot.paste.post(tb, syntax='py')
 
         send_embed = SaturnEmbed(
@@ -36,7 +40,7 @@ class ErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, exc):
         if hasattr(ctx.command, 'on_error'):
-            return 
+            return
 
         if isinstance(exc, commands.CommandNotFound):
             pass
@@ -78,12 +82,6 @@ class ErrorHandler(commands.Cog):
         elif isinstance(exc, commands.RoleNotFound):
             em = Embed(
                 description=f"{CROSS} No such role was found.",
-                colour=RED)
-            await ctx.send(embed=em)
-
-        elif isinstance(exc, discord.HTTPException):
-            em = Embed(
-                description=f"{CROSS} Whoops, looks like that didn't go as planned. Try again later?",
                 colour=RED)
             await ctx.send(embed=em)
 
@@ -160,18 +158,18 @@ class ErrorHandler(commands.Cog):
 
         elif isinstance(exc, RoleNotHighEnough):
             em = SaturnEmbed(
-                    description=f"{CROSS} You are not high enough in the role hierarchy to perform this action.",
-                    color=RED)
+                description=f"{CROSS} You are not high enough in the role hierarchy to perform this action.",
+                color=RED)
             await ctx.send(embed=em)
 
         elif isinstance(exc, BotRoleNotHighEnough):
             em = SaturnEmbed(
-                    description=f"{CROSS} I am not high enough in the role hierarchy to perform this action.",
-                    color=RED)
+                description=f"{CROSS} I am not high enough in the role hierarchy to perform this action.",
+                color=RED)
             await ctx.send(embed=em)
 
         elif isinstance(exc, InvalidLimit):
-            em = SaturnEmbed(   
+            em = SaturnEmbed(
                 description=f"{CROSS} The limit provided is not within acceptable boundaries.\n"
                             f"```Limit must be in between 1 and 1000 messages```",
                 color=RED)
@@ -179,21 +177,32 @@ class ErrorHandler(commands.Cog):
 
         elif isinstance(exc, IsAdministrator):
             em = SaturnEmbed(
-                    description=f"{CROSS} This member has the `administrator` permission.",
-                    color=RED)
+                description=f"{CROSS} This member has the `administrator` permission.",
+                color=RED)
             await ctx.send(embed=em)
 
         elif isinstance(exc, commands.NoPrivateMessage):
             em = SaturnEmbed(
-                    description=f"{CROSS} This command cannot be used in private messages.",
-                    color=RED)
+                description=f"{CROSS} This command cannot be used in private messages.",
+                color=RED)
             await ctx.send(embed=em)
 
         elif hasattr(exc, "original"):
-            await self.raise_exception(exc, ctx)
+            if isinstance(exc.original, discord.Forbidden):
+                em = Embed(
+                    description=f"{CROSS} Whoops, I don't have the proper permissions to do that!",
+                    colour=RED)
+                await ctx.send(embed=em)
+
+            elif isinstance(exc.original, discord.HTTPException):
+                em = Embed(
+                    description=f"{CROSS} Whoops, looks like that didn't go as planned. Try again later?",
+                    colour=RED)
+                await ctx.send(embed=em)
 
         else:
             await self.raise_exception(exc, ctx)
+
 
 def setup(bot):
     bot.add_cog(ErrorHandler(bot))

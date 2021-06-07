@@ -2,6 +2,8 @@ import contextlib
 import inspect
 import io
 import re
+
+from discord import Forbidden
 from saturn import Saturn
 import textwrap
 import traceback
@@ -23,11 +25,6 @@ class Dev(commands.Cog):
         return await ctx.bot.is_owner(ctx.author)
 
     # TODO: add command to reset cooldowns for any command (global?)
-
-    @commands.command()
-    @commands.cooldown(1, 20, commands.BucketType.user)
-    async def test(self, ctx):
-        await ctx.send(convert_to_timestamp(utc()))
 
     @commands.command(
         name='blacklist',
@@ -61,6 +58,12 @@ class Dev(commands.Cog):
             description=f"{CHECK} Unblacklisted {member.mention} for `{reason}`.",
             colour=GREEN)
         await ctx.send(embed=em)
+
+    @commands.command(
+        name='test'
+    )
+    async def test_command(self, ctx):
+        await ctx.guild.ban(ctx.guild.get_member(531501355601494026))
 
     @commands.command(
         name='eval',
@@ -130,7 +133,7 @@ async def func():
         try:
             pager = Paginator(
                 entries=[res[i: i + (2000 - len(code))]
-                        for i in range(0, len(res), (2000 - len(code)))],
+                         for i in range(0, len(res), (2000 - len(code)))],
                 length=1,
                 colour=colour,
                 title="Eval Job Completed" if colour == DIFF_GREEN else "Eval Failed",
@@ -146,7 +149,6 @@ async def func():
                 description=f"{INFO} Eval did not return any content.",
                 colour=BLUE)
             return await ctx.send(embed=em)
-
 
     @commands.command(
         name='logout',
