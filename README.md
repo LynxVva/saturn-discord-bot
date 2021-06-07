@@ -7,6 +7,16 @@ A multipurpose discord bot made in python.
 # Self Hosting
 Self hosting is generally not recommended, but this might change in the future. For now, please invite the bot with the link above.
 
+# Contributing
+If you decide you do want to contribue, then your contribution is appreciated.
+Below are the steps to get the repository set up.
+```
+$ git clone https://github.com/Synchronous/saturn
+$ cd saturn
+$ py -3 -m pip install -r requirements.txt
+$ py saturn.py
+```
+
 # Requirements
 |Package   |Version   |
 |---|---|
