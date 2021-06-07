@@ -16,7 +16,8 @@ class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.bot.remove_command('help')
-        self.unlisted_cogs = ("Events", "ErrorHandler", "Reaction Roles", "Dev", "Jishaku", 'Help')
+        self.unlisted_cogs = ("Events", "ErrorHandler",
+                              "Reaction Roles", "Dev", "Jishaku", 'Help')
 
     @staticmethod
     async def can_run(command, ctx) -> bool:
@@ -45,7 +46,7 @@ class Help(commands.Cog):
                 return f" ↳ {await syntax(command)}"
 
         else:
-            return        
+            return
 
     async def cog_command_syntax(self, ctx: commands.Context, command: commands.Command) -> str:
         """
@@ -65,18 +66,21 @@ class Help(commands.Cog):
         """
         em = SaturnEmbed(
             title=f'Help for {"command" if not len(command.parents) else "subcommand"} `{command.name}`',
-            description=f"{command.description}",  # I put this in a f-string because I can format it later lol
+            # I put this in a f-string because I can format it later lol
+            description=f"{command.description}",
             colour=MAIN,
             timestamp=utc()
         )
 
         em.add_field(name='Syntax', value=f"`{await syntax(command)}`")
         if command.aliases:
-            em.add_field(name='Aliases', value=f"`{', '.join(command.aliases)}`")
+            em.add_field(name='Aliases',
+                         value=f"`{', '.join(command.aliases)}`")
 
         cooldown = command.get_cooldown_retry_after(ctx)
         if cooldown > 0:
-            em.add_field(name='Cooldown Remaining', value=f"`{convert_time(int(cooldown))}`")
+            em.add_field(name='Cooldown Remaining',
+                         value=f"`{convert_time(int(cooldown))}`")
 
         subcommands = [
             f"`{await self.full_command_syntax(ctx, cmd)}`" for cmd in command.cog.walk_commands() if cmd.parent == command
@@ -119,6 +123,7 @@ class Help(commands.Cog):
                     description=f"[Invite (Recommended)]({NORMAL_INVITE})\n"
                                 f"[Invite (Administrator)]({ADMIN_INVITE})\n"
                                 f"[Discord Bot List]({DISCORDBOTLIST_URL})\n"
+                                f"[Top.gg]({TOPGG_URL})\n"
                                 f"[Support Server]({SUPPORT_SERVER})",
                     colour=MAIN
                 )
@@ -127,7 +132,7 @@ class Help(commands.Cog):
             title.extend(cogs)
 
             entries.append(
-                f"Saturn is a multipurpose discord bot.\n```yaml\n" + 
+                f"Saturn is a multipurpose discord bot.\n```yaml\n" +
                 '\n'.join([f"Page {index} : {c}" for index, c in enumerate(cogs, start=2)]) +
                 f"```\nPress the numbers emote to skip to a page."
                 f"\nPress the info emote to learn how to navigate the help menu.")
@@ -155,7 +160,8 @@ class Help(commands.Cog):
             _cog = (str(entity).lower()).title()
             _cmd = str(entity).lower()
             filtered_commands = flatten(
-                [[c for c in self.bot.get_cog(cog).walk_commands()] for cog in self.unlisted_cogs]
+                [[c for c in self.bot.get_cog(cog).walk_commands()]
+                 for cog in self.unlisted_cogs]
             )
 
             if entity.lower() == 'modules':
@@ -168,12 +174,13 @@ class Help(commands.Cog):
                     timestamp=utc(),
                     colour=MAIN
                 )
-                em.set_footer(text="Make sure the name of the module is exactly the same as listed above.")
+                em.set_footer(
+                    text="Make sure the name of the module is exactly the same as listed above.")
                 return await ctx.send(embed=em)
 
             elif self.bot.get_cog(_cog):
                 if _cog not in self.unlisted_cogs:
-                    cog = self.bot.get_cog(_cog)                
+                    cog = self.bot.get_cog(_cog)
                     for command in cog.walk_commands():
                         invoke = await self.cog_command_syntax(ctx, command)
                         if invoke:
@@ -186,7 +193,7 @@ class Help(commands.Cog):
                     return await pager.start(ctx)
 
                 elif _cog in self.unlisted_cogs and ctx.author.id in self.bot.owner_ids:
-                    cog = self.bot.get_cog(_cog)                
+                    cog = self.bot.get_cog(_cog)
                     for command in cog.walk_commands():
                         invoke = await self.cog_command_syntax(ctx, command)
                         if invoke:

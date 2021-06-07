@@ -1,15 +1,16 @@
-from assets.time import utc
-from discord.errors import Forbidden
-from assets.cmd import get_permissions, get_prefix
 import os
+from itertools import cycle
 from pathlib import Path
 
 import motor.motor_asyncio
 import mystbin
+from discord.errors import Forbidden
 from discord.ext import tasks
 from dotenv import load_dotenv
 
 from assets import *
+from assets.cmd import get_permissions, get_prefix
+from assets.time import utc
 
 load_dotenv()
 
@@ -70,27 +71,14 @@ class Saturn(commands.Bot):
         self.starboard = self.db["starboard"]
 
         self.paste = mystbin.Client()
+        self.topgg_client = topgg.DBLClient(self, os.environ.get(
+            "TOPGGTOKEN"), autopost=True, autopost_interval=900)
+        self.topgg_webhook = topgg.WebhookManager(
+            self).dbl_webhook("/dblwebhook", "password")
 
     def run(self):
         print(f"Running {self.__name__}...")
         super().run(self.TOKEN, reconnect=True)
-
-    # async def on_error(self, error, *args, **kwargs):
-    #     if error == "on_command_error":
-    #         em = SaturnEmbed(
-    #             title="Something went wrong...",
-    #             description="An unexpected event happened.",
-    #             colour=RED
-    #         )
-    #         await self.stdout.send(embed=em)
-
-    #     em = SaturnEmbed(
-    #         title="An unexpected error occurred...",
-    #         description="Please check logs for more details.",
-    #         colour=RED
-    #     )
-    #     await self.stdout.send(embed=em)
-    #     raise
 
     async def process_commands(self, message):
         ctx = await self.get_context(message)
@@ -190,10 +178,18 @@ class Saturn(commands.Bot):
     async def on_message(self, message):
         await self.process_commands(message)
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(seconds=45)
     async def change_pres(self):
-        await self.change_presence(
-            activity=discord.Game(name=f"{PREFIX}help | V{self.__version__}"))
+        presences = (
+            f"{PREFIX}help | v{self.__version__}",
+            f"{PREFIX}help | {len(self.guilds)} guilds",
+            f"{PREFIX}help | {len(self.users)} users",
+        )
+
+        for i in range(3):
+            await self.change_presence(
+                activity=discord.Game(name=presences[i]))
+            await asyncio.sleep(15)
 
 
 if __name__ == '__main__':

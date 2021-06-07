@@ -1,17 +1,13 @@
-from assets.time import convert_to_timestamp, general_convert_time, utc
-from discord.channel import TextChannel
-from assets.cmd import get_permissions
-import re
 import os
+import re
 from copy import deepcopy
-from time import strftime, time as _time
-
-from discord.errors import HTTPException
+import time
 
 from assets import *
+from assets.cmd import get_permissions
+from assets.time import convert_to_timestamp, general_convert_time, utc
 from dateutil.relativedelta import relativedelta
 from discord.ext import tasks
-import textwrap
 
 log = logging.getLogger(__name__)
 
@@ -284,25 +280,38 @@ class Utility(commands.Cog):
 
     @commands.command(
         name='ping',
+        aliases=['latency'],
         description='Used to check if the bot is alive')
     async def ping(self, ctx):
-        latency = float(f"{self.bot.latency * 1000:.2f}")
-        if latency < 60:
+        ws_latency = float(f"{self.bot.latency * 1000:.2f}")
+        if ws_latency < 60:
             colour = GREEN
 
-        elif latency < 101:
+        elif ws_latency < 101:
             colour = GOLD
 
         else:
             colour = RED
 
-        start = _time()
+        rt_start = time.time()
         msg = await ctx.send("Pinging...")
-        end = _time()
+        rt_end = time.time()
+
+        rt_latency = rt_end - rt_start
+
+        db_start = time.time()
+        data = self.bot.config.find_one({"_id": ctx.guild.id})
+        db_end = time.time()
+
+        db_latency = db_end - db_start
+
         em = SaturnEmbed(
-            description=f"Pong!\n**Bot -** `{latency}ms`\n"
-                        f"**API -** `{(end - start) * 1000:,.2f}ms`\n",
+            title="Pong!",
+            description=f"**Websocket -** `{ws_latency}ms`\n"
+                        f"**Round Trip -** `{rt_latency * 1000:,.2f}ms`\n"
+                        f"**Database -** `{db_latency * 1000:,.2f}ms`",
             colour=colour)
+
         await msg.edit(content=None, embed=em)
 
     # noinspection SpellCheckingInspection

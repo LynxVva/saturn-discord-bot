@@ -82,6 +82,7 @@ ADMIN_INVITE = "https://discord.com/oauth2/authorize?client_id=79932803666293557
 NORMAL_INVITE = "https://discord.com/oauth2/authorize?client_id=799328036662935572&permissions=536145143&redirect_uri" \
                 "=https://127.0.0.1:5000/login&scope=bot"
 DISCORDBOTLIST_URL = "https://discordbotlist.com/bots/saturn-9049"
+TOPGG_URL = "https://top.gg/bot/799328036662935572"
 SUPPORT_SERVER = "https://discord.gg/A4DFFUD3zX"
 
 DUEL_HEAL_MESSAGES = [

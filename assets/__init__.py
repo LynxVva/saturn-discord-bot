@@ -8,6 +8,7 @@ import asyncio
 import datetime
 import logging
 import typing
+import topgg
 
 import discord
 import pytz
