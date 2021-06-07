@@ -61,6 +61,7 @@ class Utility(commands.Cog):
         self.polls = {}
         self.numbers = ('1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣',
                         '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟')
+        self.yes_no = ('👍', '👎')
         self.snipe_task = self.clear_snipe_cache.start()
 
     def cog_unload(self):
@@ -81,10 +82,38 @@ class Utility(commands.Cog):
     async def before_clear_snipe_cache(self):
         await self.bot.wait_until_ready()
 
+    @commands.command(
+        name='ynpoll',
+        aliases=['ynpl', 'yesnopoll', 'yesnopl'],
+        description='Create a simple yes/no poll.'
+    )
+    @commands.cooldown(1, 3, commands.BucketType.member)
+    async def yes_no_poll(self, ctx, channel: typing.Optional[discord.TextChannel], *, question):
+        channel = channel or ctx.channel
+
+        em = SaturnEmbed(
+            title=question,
+            description=":thumbsup: Yes\n\n:thumbsdown: No",
+            colour=GOLD,
+            timestamp=utc()
+        )
+        em.set_footer(text=f"Yes/no poll by {ctx.author}")
+        msg = await channel.send(embed=em)
+        self.polls[msg.id] = {
+            "type": "ynpoll",
+            "question": question,
+            "choices": ("Yes", "No"),
+            "channel": msg.channel.id,
+            "author": ctx.author.id,
+            "guild": ctx.guild.id,
+        }
+        for emoji in self.yes_no:
+            await msg.add_reaction(emoji)
+
     @commands.group(
         name='poll',
         aliases=['pl', 'question'],
-        description="Start a poll for others to vote on. The questions",
+        description="Start a poll for others to vote on. The questions should be in double quotes.",
         invoke_without_command=True
     )
     @commands.cooldown(1, 3, commands.BucketType.member)
@@ -110,12 +139,13 @@ class Utility(commands.Cog):
                 ["{0} {1}".format(self.numbers[num], choice.replace('"', ''))
                  for num, choice in enumerate(choices)]
             ),
-            colour=MAIN,
+            colour=BLUE,
             timestamp=utc()
         )
-        em.set_footer(text=f"Poll by {ctx.author.name}")
+        em.set_footer(text=f"Poll by {ctx.author}")
         msg = await channel.send(embed=em)
         self.polls[msg.id] = {
+            "type": "poll",
             "question": question,
             "choices": choices,
             "channel": msg.channel.id,
@@ -177,16 +207,19 @@ class Utility(commands.Cog):
         _poll = self.polls[message.id]
         reactions = []
 
-        index = 0
         for reaction in message.reactions:
-            index += 1
-            if str(reaction.emoji) in self.numbers:
-                reactions.append(reaction)
+            if _poll["type"] == "poll":
+                if str(reaction.emoji) in self.numbers:
+                    reactions.append(reaction)
+
+            elif _poll["type"] == "ynpoll":
+                if str(reaction.emoji) in self.yes_no:
+                    reactions.append(reaction)
 
         em = SaturnEmbed(
             title=_poll["question"],
             colour=MAIN,
-            timestamp=utc()
+            timestamp=message.created_at
         )
         total_votes = 0
         for reaction in reactions:
@@ -210,7 +243,7 @@ class Utility(commands.Cog):
                 value="{} {} votes (**{}%**)".format(await self.get_poll_results(tens_percentage), count, total_percentage)
             )
 
-        em.set_footer(text="Poll by {}".format(
+        em.set_footer(text="Results of the poll by {}".format(
             ctx.guild.get_member(_poll["author"])))
         await ctx.send(embed=em)
 
