@@ -2,7 +2,6 @@ __pycache__
 .vscode
 .idea
 .env
-run.bat
 saturn.log
 venv
 assets/imgs/profile.jpg
