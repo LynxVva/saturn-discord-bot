@@ -47,7 +47,11 @@ class Fun(commands.Cog):
 		1, 3, commands.BucketType.member)
 	async def anonymous_quote_cmd(self, ctx, channel: typing.Optional[discord.TextChannel], *, quote: str):
 		if not channel:
-			await ctx.message.delete()
+			try:
+				await ctx.message.delete()
+
+			except (discord.NotFound, discord.Forbidden):
+				pass
 
 		else:
 			await ctx.message.add_reaction(CHECK)

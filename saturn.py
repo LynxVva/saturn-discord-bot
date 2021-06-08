@@ -71,10 +71,12 @@ class Saturn(commands.Bot):
         self.starboard = self.db["starboard"]
 
         self.paste = mystbin.Client()
+
         self.topgg_client = topgg.DBLClient(self, os.environ.get(
             "TOPGGTOKEN"), autopost=True, autopost_interval=900)
         self.topgg_webhook = topgg.WebhookManager(
-            self).dbl_webhook("/dblwebhook", "password")
+            self).dbl_webhook("/dblwebhook", os.environ.get("TOPGGAUTH"))
+        self.topgg_webhook.run(7000)
 
     def run(self):
         print(f"Running {self.__name__}...")
@@ -95,12 +97,6 @@ class Saturn(commands.Bot):
             elif not perms['embed_links']:
                 return await ctx.send("Hey! Please enable the `Embed Links` permission for me!")
 
-            elif not perms['manage_messages']:
-                em = SaturnEmbed(
-                    description=f"{WARNING} I need to be able to delete messages! Please enable that permission.",
-                    colour=GOLD)
-                return await ctx.send(embed=em)
-
             elif (
                 (not perms['external_emojis']) or
                 (not perms['attach_files']) or
@@ -108,7 +104,7 @@ class Saturn(commands.Bot):
             ):
                 em = SaturnEmbed(
                     description=f"{WARNING} Oops! Please make sure that I have the following permissions:"
-                                f"```Send Messages, Embed Links, Use External Emojis, Attach Files, Add Reactions, Manage Messages```",
+                                f"```Send Messages, Embed Links, Use External Emojis, Attach Files, Add Reactions```",
                     colour=GOLD)
                 return await ctx.send(embed=em)
 
@@ -141,7 +137,6 @@ class Saturn(commands.Bot):
         self.start_time = utc()
 
         if not self.ready:
-            self.topgg_webhook.run(7000)
             self.ready = True
             for _file in os.listdir(self.path + '/cogs'):
                 if _file.endswith('.py') and not _file.startswith('_'):

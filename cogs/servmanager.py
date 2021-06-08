@@ -78,7 +78,11 @@ class Management(commands.Cog, name='Server Management'):
                         continue
 
                 else:
-                    await msg.delete()
+                    try:
+                        await msg.delete()
+
+                    except (discord.NotFound, discord.Forbidden):
+                        pass
                     em = SaturnEmbed(
                         description=f"{CHECK} Added {role.mention} to `{len(added_roles)}` members.",
                         colour=GREEN)
@@ -107,7 +111,12 @@ class Management(commands.Cog, name='Server Management'):
                 continue
 
         else:
-            await msg.delete()
+            try:
+                await msg.delete()
+
+            except (discord.NotFound, discord.Forbidden):
+                pass
+            
             em = SaturnEmbed(
                     description=f"{CHECK} Removed {role.mention} from `{len(removed_roles)}` members.",
                     colour=GREEN)

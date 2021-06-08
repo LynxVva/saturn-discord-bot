@@ -13,7 +13,12 @@ from assets import *
 
 # noinspection PyUnusedLocal, SpellCheckingInspection
 async def purge_msgs(bot, ctx, limit, check):
-    await ctx.message.delete()
+    try:
+        await ctx.message.delete()
+
+    except (discord.NotFound, discord.Forbidden):
+        pass
+
     deleted = await ctx.channel.purge(
         limit=limit,
         after=datetime.datetime.utcnow() - datetime.timedelta(weeks=2),

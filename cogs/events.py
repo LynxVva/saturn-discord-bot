@@ -36,10 +36,13 @@ class Events(commands.Cog):
             try:
                 member_logs = member.guild.get_channel(data['member_logs'])
 
-            except (TypeError, KeyError): return
-            if not member_logs: return
+            except (TypeError, KeyError):
+                return
+            if not member_logs:
+                return
 
-            created_delta = (utc() - member.created_at.replace(tzinfo=datetime.timezone.utc)).total_seconds()
+            created_delta = (
+                utc() - member.created_at.replace(tzinfo=datetime.timezone.utc)).total_seconds()
 
             em = SaturnEmbed(
                 title='Member Joined',
@@ -49,7 +52,8 @@ class Events(commands.Cog):
             )
             em.set_thumbnail(url=member.avatar_url)
             em.set_author(icon_url=member.avatar_url, name=member)
-            em.add_field(name='Account Created', value=general_convert_time(created_delta) + ' ago')
+            em.add_field(name='Account Created',
+                         value=general_convert_time(created_delta) + ' ago')
             em.set_footer(text=f"Member #{len(guild.members)}")
             await member_logs.send(embed=em)  # send the member embed thing`
 
@@ -63,8 +67,10 @@ class Events(commands.Cog):
             try:
                 member_logs = member.guild.get_channel(data['member_logs'])
 
-            except (TypeError, KeyError): return
-            if not member_logs: return
+            except (TypeError, KeyError):
+                return
+            if not member_logs:
+                return
 
             em = SaturnEmbed(
                 title='Member Left',
@@ -113,9 +119,11 @@ class Events(commands.Cog):
                 timestamp=utc()
             )
             em.set_thumbnail(url=message.author.avatar_url)
-            em.set_author(icon_url=message.author.avatar_url, name=message.author)
+            em.set_author(icon_url=message.author.avatar_url,
+                          name=message.author)
             em.add_field(name="Author", value=message.author.mention)
-            em.add_field(name="Channel", value=f"{message.channel.mention} `(#{message.channel})`")
+            em.add_field(
+                name="Channel", value=f"{message.channel.mention} `(#{message.channel})`")
             em.add_field(name="Content", value=f"{message.content}")
             em.set_footer(text=f"Message ID - {message.id}")
             await message_logs.send(embed=em)  # send the embed
@@ -166,10 +174,12 @@ class Events(commands.Cog):
             em.set_thumbnail(url=after.author.avatar_url)
             em.set_author(icon_url=after.author.avatar_url, name=after.author)
             em.add_field(name="Author", value=after.author.mention)
-            em.add_field(name="Channel", value=f"{after.channel.mention} `(#{after.channel})`")
+            em.add_field(name="Channel",
+                         value=f"{after.channel.mention} `(#{after.channel})`")
             em.add_field(name="Before", value=f"{before.content}")
             em.add_field(name="After", value=f"{after.content}")
-            em.set_footer(text=f"Message ID - {after.id}")  # footer because why not
+            # footer because why not
+            em.set_footer(text=f"Message ID - {after.id}")
             await message_logs.send(embed=em)  # send the embed
 
     @commands.Cog.listener()
@@ -270,7 +280,7 @@ class Events(commands.Cog):
 
             try:
                 msg_id = _starboard['star_id']
-                
+
             except (TypeError, KeyError):
                 msg_id = None
 
@@ -295,7 +305,12 @@ class Events(commands.Cog):
                             'stars': stars - 1, 'star_id': None
                         }
                     }, upsert=True)
-                return await msg.delete()
+                try:
+                    return await msg.delete()
+
+                except (discord.NotFound, discord.Forbidden):
+                    pass
+                
 
             if stars < 1:
                 return await self.bot.starboard.delete_one({'_id': message.id})
@@ -313,8 +328,10 @@ class Events(commands.Cog):
         try:
             member_logs = after.guild.get_channel(data['member_logs'])
 
-        except (TypeError, KeyError): return
-        if not member_logs: return
+        except (TypeError, KeyError):
+            return
+        if not member_logs:
+            return
 
         if before.roles != after.roles:
             for role in before.roles:
@@ -342,7 +359,7 @@ class Events(commands.Cog):
                     )
                     em.set_author(icon_url=after.avatar_url, name=after.name)
                     em.set_thumbnail(url=after.avatar_url)
-                    await member_logs.send(embed=em) 
+                    await member_logs.send(embed=em)
 
         if before.nick != after.nick:
             em = SaturnEmbed(
@@ -354,7 +371,7 @@ class Events(commands.Cog):
             em.set_thumbnail(url=after.avatar_url)
             em.add_field(name='Before', value=before.nick)
             em.add_field(name='After', value=after.nick)
-            await member_logs.send(embed=em)     
+            await member_logs.send(embed=em)
 
     # @commands.Cog.listener()
     # async def on_user_update(self, before, after):
@@ -366,7 +383,7 @@ class Events(commands.Cog):
     #     if not member_logs: return
 
         # if await self.member_log_level_check("HIGH", before.guild):
-        #     if before.avatar != after.avatar:                   
+        #     if before.avatar != after.avatar:
         #         em = SaturnEmbed(
         #             title='Avatar Changed',
         #             colour=SLIGHTLY_LIGHTER_BLUE,
@@ -375,10 +392,8 @@ class Events(commands.Cog):
         #         em.set_author(icon_url=after.avatar_url, name=after.name)
         #         em.set_thumbnail(url=after.avatar_url)
         #         em.add_field(name="Before", value=before.avatar_url)
-        #         await member_logs.send(embed=em)     
+        #         await member_logs.send(embed=em)
 
-
-    
 
 def setup(bot):
     bot.add_cog(Events(bot))  # add this stupid cog i'm tired

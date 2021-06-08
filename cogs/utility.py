@@ -545,7 +545,12 @@ class Utility(commands.Cog):
             file = discord.File(
                 f'{self.bot.path}/assets/txt_files/{channel.id}-export.txt')
 
-        await msg.delete()
+        try:
+            await msg.delete()
+
+        except (discord.NotFound, discord.Forbidden):
+            pass
+        
         em = SaturnEmbed(
             title='Channel Export',
             description=f"Message contents of <#{channel.id}>\n"
