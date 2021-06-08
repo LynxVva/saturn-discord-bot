@@ -141,6 +141,7 @@ class Saturn(commands.Bot):
         self.start_time = utc()
 
         if not self.ready:
+            self.topgg_webhook.run(7000)
             self.ready = True
             for _file in os.listdir(self.path + '/cogs'):
                 if _file.endswith('.py') and not _file.startswith('_'):

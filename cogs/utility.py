@@ -1,7 +1,7 @@
 import os
 import re
-from copy import deepcopy
 import time
+from copy import deepcopy
 
 from assets import *
 from assets.cmd import get_permissions
@@ -262,7 +262,7 @@ class Utility(commands.Cog):
             except KeyError:
                 pass
 
-    @ commands.command(
+    @commands.command(
         name='uptime',
         aliases=['onlinesince', 'onlinetime'],
         description='Check the bot\'s uptime.'
@@ -293,15 +293,15 @@ class Utility(commands.Cog):
         else:
             colour = RED
 
-        rt_start = time.time()
+        rt_start = epoch()
         msg = await ctx.send("Pinging...")
-        rt_end = time.time()
+        rt_end = epoch()
 
         rt_latency = rt_end - rt_start
 
-        db_start = time.time()
+        db_start = epoch()
         data = self.bot.config.find_one({"_id": ctx.guild.id})
-        db_end = time.time()
+        db_end = epoch()
 
         db_latency = db_end - db_start
 
@@ -480,12 +480,12 @@ class Utility(commands.Cog):
 
     # TODO: add reminder command yay
 
-    @ commands.command(
+    @commands.command(
         name='source',
         aliases=['code', 'src'],
         description='Show the source link to Saturn\'s code.'
     )
-    @ commands.cooldown(1, 2, commands.BucketType.member)
+    @commands.cooldown(1, 2, commands.BucketType.member)
     async def view_bot_source(self, ctx):
         em = SaturnEmbed(
             description=f'[Click here]({self.bot.src}) to view the source code.',
@@ -496,7 +496,7 @@ class Utility(commands.Cog):
             icon_url=self.bot.user.avatar_url)
         await ctx.send(embed=em)
 
-    @ commands.command(
+    @commands.command(
         name='roles',
         description='View your roles.'
     )

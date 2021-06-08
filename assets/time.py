@@ -2,10 +2,13 @@ from assets import *
 import datetime
 import pytz
 
+
 def utc():
     return datetime.datetime.now(datetime.timezone.utc)
 
 # noinspection PyBroadException
+
+
 def convert_time(_time) -> str:
     """
     Convert time into a years, hours, minute, seconds thing.
@@ -40,6 +43,7 @@ def convert_time(_time) -> str:
     except Exception:
         return 'indefinitely'
 
+
 def general_convert_time(_time, to_places=2) -> str:
     """
     Used to get a more readable time conversion
@@ -47,6 +51,11 @@ def general_convert_time(_time, to_places=2) -> str:
     times = convert_time(_time).split(' ')
     return ' '.join(times[:to_places]) + (', ' if times[to_places:(to_places * 2)] else '') \
            + ' '.join(times[to_places:(to_places * 2)])
+
+
+def epoch():
+    return utc().timestamp()
+
 
 def convert_to_timestamp(_time: datetime.datetime) -> str:
     """
