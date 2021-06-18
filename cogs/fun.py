@@ -1,3 +1,4 @@
+from saturn import Saturn
 from discord.ext.commands.converter import clean_content
 from assets.cmd import Dueler
 import io
@@ -227,6 +228,7 @@ class Fun(commands.Cog):
 		description='Play rock paper scissors with the bot! '
 					'This is not rigged and outputs generated via the `random` module.')
 	@commands.cooldown(1, 1, commands.BucketType.member)
+	@commands.max_concurrency(1, commands.BucketType.channel)
 	async def rps_cmd(self, ctx, choice):
 		if choice.startswith('r'):
 			choice = 'rock'
@@ -268,6 +270,12 @@ class Fun(commands.Cog):
 
 		options = ["rock", "paper", "scissors"]
 
+		emotes = {
+			"rock": ":rock:",
+			"paper": ":notepad_spiral:",
+			"scissors": ":scissors:",
+		}
+
 		if choice in options:
 			computer_choice = random_choice(options)
 
@@ -276,20 +284,20 @@ class Fun(commands.Cog):
 			if winning_choice:
 				if winning_choice == choice:
 					win = SaturnEmbed(
-						description=f"```You chose {choice}\n{self.bot.__name__} chose {computer_choice}```",
+						description=f"```You chose {choice} {emotes[choice]}\n{self.bot.__name__} chose {computer_choice} {emotes[choice]}```",
 						color=GREEN)
 					win.set_author(icon_url=ctx.author.avatar_url, name='You won!')
 					await ctx.send(embed=win)
 
 				elif winning_choice == computer_choice:
 					loss = SaturnEmbed(
-						description=f"```You chose {choice}\n{self.bot.__name__} chose {computer_choice}```",
+						description=f"```You chose {choice} {emotes[choice]}\n{self.bot.__name__} chose {computer_choice} {emotes[choice]}```",
 						color=RED)
 					loss.set_author(icon_url=ctx.author.avatar_url, name='You lost!')
 					await ctx.send(embed=loss)
 			else:
 				tie = SaturnEmbed(
-					description=f"```You both chose {choice}```",
+					description=f"```You both chose {choice} {emotes[choice]}```",
 					color=GOLD)
 				tie.set_author(icon_url=ctx.author.avatar_url, name='You tied!')
 				await ctx.send(embed=tie)
@@ -401,7 +409,20 @@ class Fun(commands.Cog):
 		aliases=['fight'],
 		description='Duel another person! Attacks are random.'
 	)
+	@commands.max_concurrency(1, commands.BucketType.channel)
 	async def duel_member(self, ctx, member: discord.Member):
+		if member.id == ctx.author.id:
+			em = SaturnEmbed(
+				description=f":boom: {ctx.author.mention} pushed themselves off a cliff.",
+				colour=RED)
+			return await ctx.send(embed=em)
+
+		if member.id == self.bot.user.id:
+			em = SaturnEmbed(
+				description=f":boom: {ctx.author.mention} tried to fight me, so I snapped them like a twig.",
+				colour=RED)
+			return await ctx.send(embed=em)		
+
 		p1, p2, play = Dueler(ctx.author), Dueler(member), True
 		order = [(p1, p2), (p2, p1)]
 

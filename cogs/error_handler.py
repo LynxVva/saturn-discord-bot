@@ -73,6 +73,12 @@ class ErrorHandler(commands.Cog):
                 colour=RED)
             await ctx.send(embed=em)
 
+        elif isinstance(exc, commands.MaxConcurrencyReached):
+            em = Embed(
+                description=f"{CROSS} Too many users are using this command at the same time.",
+                colour=RED)
+            await ctx.send(embed=em)
+
         elif isinstance(exc, commands.MemberNotFound):
             em = Embed(
                 description=f"{CROSS} No such member was found.",
