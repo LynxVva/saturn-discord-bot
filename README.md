@@ -13,8 +13,9 @@ Below are the steps to get the repository set up.
 ```
 $ git clone https://github.com/Synchronous/saturn
 $ cd saturn
-$ py -3 -m pip install -r requirements.txt
 $ py -m venv venv
+$ venv\scripts\activate.bat
+$ (venv) py -3 -m pip install -r requirements.txt
 ```
 Create a file named .env, and paste in the follow information. Remember to remove the <>!
 ```
